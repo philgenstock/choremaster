@@ -1,3 +1,4 @@
 rootProject.name = "choremaster"
 
-includeBuild("rest")
+include("develop")
+include("rest")

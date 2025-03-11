@@ -7,14 +7,18 @@ plugins {
     kotlin("plugin.allopen") version "1.9.22"
 }
 
-repositories {
-    mavenCentral()
-}
-
 group = "de.philgenstock"
 version = "0.0.1-SNAPSHOT"
-subprojects {
+allprojects {
 
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.kotlin.plugin.allopen")
+    apply(plugin = "org.jetbrains.kotlin.plugin.spring")
+    apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "org.springframework.boot")
+    repositories {
+        mavenCentral()
+    }
     allOpen {
         annotation("jakarta.persistence.Entity")
         annotation("jakarta.persistence.MappedSuperclass")
