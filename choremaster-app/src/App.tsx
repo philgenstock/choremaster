@@ -1,10 +1,10 @@
 import "./App.css"
-import { HouseholdSelector } from "./features/household/HouseholdSelector"
+import {Header} from "./components/header";
 
 const App = () => {
   return (
     <>
-      <HouseholdSelector />
+        <Header></Header>
     </>
   )
 }
