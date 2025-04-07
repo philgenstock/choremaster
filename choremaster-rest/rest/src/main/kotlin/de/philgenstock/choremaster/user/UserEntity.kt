@@ -22,4 +22,6 @@ data class UserEntity(
     @Column(name = "last_name")
     val lastName: String,
     val email: String,
-)
+) {
+    companion object
+}
