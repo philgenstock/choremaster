@@ -12,7 +12,6 @@ export const HouseholdSelector = () => {
       useGetHouseHoldsQuery(
         undefined, {skip: isLoggedIn}
       )
-  console.debug(isLoggedIn)
   if(isLoggedIn) {
     return <>
       <Select className={styles.select}>

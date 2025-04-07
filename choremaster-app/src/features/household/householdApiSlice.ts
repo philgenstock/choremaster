@@ -11,7 +11,6 @@ interface HouseHold {
 export const householdApiSlice = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: `${baseUrl}/household` ,prepareHeaders: (headers) => {
       const token = getTokenFromLocalStorage()
-          console.debug("TOKEN", token)
       if(token) {
         headers.set("Authorization", token)
       }
