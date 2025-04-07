@@ -6,9 +6,11 @@ import java.time.Instant
 
 interface UserRepository : CrudRepository<UserEntity, Long> {
     @Query(
-        "INSERT INTO users(firstName, lastName, email, lastLogin, createdDate) " +
-            "VALUES (:firstName, :lastName, :email, now,now)" +
-            "ON CONFLICT (email) DO UPDATE SET lastLogin=:now RETURNING *",
+        nativeQuery = true,
+        value =
+            "INSERT INTO users(first_name, last_name, email, last_login, created_date) " +
+                "VALUES (:firstName, :lastName, :email, :now,:now)" +
+                "ON CONFLICT (email) DO UPDATE SET last_login=:now RETURNING *",
     )
     fun findOrCreateUser(
         firstName: String,
@@ -16,4 +18,6 @@ interface UserRepository : CrudRepository<UserEntity, Long> {
         email: String,
         now: Instant,
     ): UserEntity
+
+    fun findByEmail(username: String): UserEntity?
 }

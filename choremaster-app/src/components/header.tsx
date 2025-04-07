@@ -3,15 +3,15 @@ import {AppBar, IconButton, Toolbar, Typography} from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import {CredentialResponse, GoogleLogin} from "@react-oauth/google";
 import {useAppDispatch, useAppSelector} from "../app/hooks";
-import {selectProfile, setTokenAndFetchProfile, userSlice} from "../features/user/userSlice";
+import {initializeUser, selectDisplayName, userSlice} from "../features/user/userSlice";
 
 export const Header = () => {
 
     const dispatch = useAppDispatch()
-    const userProfile = useAppSelector(selectProfile)
+    const displayName = useAppSelector(selectDisplayName)
     const onGoogleLogin = (message: CredentialResponse) => {
         if(message.credential) {
-            dispatch(setTokenAndFetchProfile(message.credential))
+            initializeUser(message.credential, dispatch)
         }
     }
 
@@ -30,9 +30,9 @@ export const Header = () => {
                 <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                     Choremaster
                 </Typography>
-                {userProfile?
+                {displayName?
                     <>
-                    {userProfile.name}
+                    {displayName}
                     </>:
                     <GoogleLogin onSuccess={onGoogleLogin} useOneTap={true}></GoogleLogin>
                 }

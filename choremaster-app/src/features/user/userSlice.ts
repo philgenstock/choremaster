@@ -1,24 +1,25 @@
 import {createAppSlice} from "../../app/createAppSlice";
-import axios, {AxiosResponse} from 'axios';
-import {PayloadAction} from "@reduxjs/toolkit";
-import {AppThunk} from "../../app/store";
+import axios from 'axios';
+import  type {AxiosResponse} from 'axios';
+import type {PayloadAction} from "@reduxjs/toolkit";
+import type {AppDispatch, AppThunk} from "../../app/store";
+import {baseUrl} from "../../app/baseUrl";
+import {saveTokenInLocalStorage} from "./authUtils";
 
 export interface UserSliceState {
     token: string | null
-    profile: any | null
+    displayName: string | null
     status: "idle" | "loading" | "failed"
 }
 
 export interface UserProfile {
-    email: string,
-    family_name: string,
-    given_name: string,
-    name: string
+    token: string,
+    displayName: string,
 }
 
 const initialState: UserSliceState = {
     token: null,
-    profile: null,
+    displayName: null,
     status: "idle"
 }
 
@@ -26,51 +27,30 @@ export const userSlice = createAppSlice({
     name: "user",
     initialState,
     reducers: create => ({
-        setToken: create.reducer(
-            (state, action: PayloadAction<string>) => {
-                state.token += action.payload
+        setUser: create.reducer(
+            (state, action: PayloadAction<UserProfile>) => {
+                saveTokenInLocalStorage(action.payload.token)
+                state.token = action.payload.token
+                state.displayName = action.payload.displayName
+
             },
-        ),
-        fetchProfile: create.asyncThunk(
-            async (token: string) => {
-                const response = await requestProfileFromGoogle(token)
-                return response.data
-            },
-            {
-                pending: state => {
-                    state.status = "loading"
-                },
-                fulfilled: (state, action) => {
-                    state.status = "idle"
-                    state.profile = action.payload
-                },
-                rejected: state => {
-                    state.status = "failed"
-                },
-            },
-        ),
+        )
     }),
     selectors: {
-        selectProfile: user => user.profile,
+        selectDisplayName: user => user.displayName,
         selectStatus: user => user.status,
+        selectIsLoggedIn: user => !!user.token,
     },
 })
 
-const {setToken, fetchProfile} =
+const {setUser} =
     userSlice.actions
 
-// Selectors returned by `slice.selectors` take the root state as their first argument.
-export const { selectProfile, selectStatus } = userSlice.selectors
+export const { selectDisplayName,selectIsLoggedIn } = userSlice.selectors
 
-export const setTokenAndFetchProfile =
-    (token: string): AppThunk =>
-        (dispatch) => {
-            dispatch(setToken(token))
-            dispatch(fetchProfile(token))
-        }
-
-
-function requestProfileFromGoogle(token: string): Promise<AxiosResponse<UserProfile>>{
-    return axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`, {
+export function initializeUser(token: string, dispatch: AppDispatch){
+    axios.post<any, AxiosResponse<UserProfile>>(`${baseUrl}/user/login?token=${token}`, {
+    }).then(result => {
+        dispatch(setUser(result.data))
     })
 }
