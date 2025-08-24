@@ -19,6 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Chormaster"
+rootProject.name = "Choremaster"
 include(":app")
- 

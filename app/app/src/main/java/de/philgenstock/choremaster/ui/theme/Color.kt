@@ -1,4 +1,4 @@
-package de.philgenstock.chormaster.ui.theme
+package de.philgenstock.choremaster.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
