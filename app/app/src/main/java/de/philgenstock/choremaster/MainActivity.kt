@@ -11,14 +11,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import de.philgenstock.choremaster.ui.theme.ChormasterTheme
+import de.philgenstock.choremaster.ui.components.LoginButton
+import de.philgenstock.choremaster.ui.theme.ChoremasterTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ChormasterTheme {
+            ChoremasterTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
                         name = "Android",
@@ -27,6 +28,10 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        const val TAG = "MainActivity"
     }
 }
 
@@ -39,12 +44,13 @@ fun Greeting(
         text = "Hello $name!",
         modifier = modifier,
     )
+    LoginButton()
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    ChormasterTheme {
+    ChoremasterTheme {
         Greeting("Android")
     }
 }
