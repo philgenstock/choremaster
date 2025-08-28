@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.credentials.CredentialManager
@@ -28,17 +27,14 @@ import org.koin.compose.koinInject
 @Composable
 fun LoginButton(
     modifier: Modifier = Modifier,
-    tokenDataStore: TokenDataStore = koinInject()
+    tokenDataStore: TokenDataStore = koinInject(),
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // Collect token flow as state
     val token by tokenDataStore.getToken().collectAsState(initial = null)
 
-    // Show login or logout button based on token existence
     if (token.isNullOrEmpty()) {
-        // Show login button if no token exists
         Button(onClick = {
             coroutineScope.launch {
                 googleLogin(context, tokenDataStore)
@@ -62,7 +58,10 @@ fun LoginButton(
 
 private lateinit var credentialManager: CredentialManager
 
-suspend fun googleLogin(context: Context, tokenDataStore: TokenDataStore) {
+suspend fun googleLogin(
+    context: Context,
+    tokenDataStore: TokenDataStore,
+) {
     if (!::credentialManager.isInitialized) {
         credentialManager = CredentialManager.create(context)
     }
@@ -70,7 +69,7 @@ suspend fun googleLogin(context: Context, tokenDataStore: TokenDataStore) {
         GetGoogleIdOption
             .Builder()
             .setFilterByAuthorizedAccounts(false)
-            .setServerClientId("226274128441-ss9th5jhomqjbsl4fl58rj3img2ppugf.apps.googleusercontent.com")
+            .setServerClientId("226274128441-0e2re0vo3p5mnf4e2nhok8m2fipncjh5.apps.googleusercontent.com")
             .setAutoSelectEnabled(true)
             .setNonce("Hq123d3")
             .build()
@@ -87,7 +86,8 @@ suspend fun googleLogin(context: Context, tokenDataStore: TokenDataStore) {
                     request = request,
                     context = context,
                 )
-            handleSignIn(result = result, context = context, tokenDataStore = tokenDataStore)
+
+            handleSignIn(result = result, tokenDataStore = tokenDataStore)
         } catch (e: GetCredentialException) {
             Log.e(MainActivity.TAG, "Failed to login user", e)
         }
@@ -96,8 +96,7 @@ suspend fun googleLogin(context: Context, tokenDataStore: TokenDataStore) {
 
 suspend fun handleSignIn(
     result: GetCredentialResponse,
-    context: Context,
-    tokenDataStore: TokenDataStore
+    tokenDataStore: TokenDataStore,
 ) {
     val credential = result.credential
     when (credential) {
@@ -110,13 +109,11 @@ suspend fun handleSignIn(
 
                     val token = googleIdTokenCredential.idToken
 
-                    // Store the token in DataStore
                     tokenDataStore.saveToken(token)
                 } catch (e: GoogleIdTokenParsingException) {
                     Log.e(MainActivity.TAG, "Received an invalid google id token response", e)
                 }
             } else {
-                // Catch any unrecognized custom credential type here.
                 Log.e(MainActivity.TAG, "Unexpected type of credential")
             }
         }

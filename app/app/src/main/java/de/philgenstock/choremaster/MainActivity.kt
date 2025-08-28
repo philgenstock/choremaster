@@ -22,7 +22,6 @@ import de.philgenstock.choremaster.ui.theme.ChoremasterTheme
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
-
     private val tokenDataStore: TokenDataStore by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,17 +33,15 @@ class MainActivity : ComponentActivity() {
                     val token by tokenDataStore.getToken().collectAsState(initial = null)
 
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier =
+                            Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        // Login/Logout button at the top
                         LoginButton(modifier = Modifier.padding(top = 16.dp))
 
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        // Only show households if user is logged in
                         if (!token.isNullOrEmpty()) {
                             HouseholdList(modifier = Modifier.weight(1f))
                         }
