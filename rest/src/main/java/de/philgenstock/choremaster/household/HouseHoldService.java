@@ -1,5 +1,7 @@
 package de.philgenstock.choremaster.household;
 
+import de.philgenstock.choremaster.user.UserEntity;
+import de.philgenstock.choremaster.user.UserService;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -10,8 +12,10 @@ public class HouseHoldService {
 
   private final HouseHoldRepository houseHoldRepository;
   private final HouseHoldConvertService houseHoldConvertService;
+  private final UserService userService;
 
   public List<HouseHoldDto> getAllHouseHolds() {
-    return houseHoldConvertService.toDtos(houseHoldRepository.findAll());
+    UserEntity currentUser = userService.getCurrentUser();
+    return houseHoldConvertService.toDtos(currentUser.getHouseHolds());
   }
 }
