@@ -38,7 +38,7 @@ public class DevelopTestData {
 
       ChoreEntity choreEntity = new ChoreEntity();
       choreEntity.setName("Putzen");
-      choreEntity.setHousehold(houseHoldEntity);
+      choreEntity.setHouseHold(houseHoldEntity);
       choreRepository.save(choreEntity);
     }
   }

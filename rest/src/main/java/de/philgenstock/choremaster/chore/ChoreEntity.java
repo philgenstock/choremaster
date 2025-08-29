@@ -16,5 +16,5 @@ public class ChoreEntity extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(name = "household_id")
-  private HouseHoldEntity household;
+  private HouseHoldEntity houseHold;
 }

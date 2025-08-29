@@ -12,6 +12,6 @@ public class ChoreService {
   private final ChoreConvertService choreConvertService;
 
   public List<ChoreDto> getChoresFor(Long houseHoldId) {
-    return choreConvertService.toDtos(choreRepository.findByHouseholdId(houseHoldId));
+    return choreConvertService.toDtos(choreRepository.findByHouseHoldId(houseHoldId));
   }
 }

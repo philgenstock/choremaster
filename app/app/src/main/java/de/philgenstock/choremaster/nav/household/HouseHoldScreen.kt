@@ -1,6 +1,7 @@
 package de.philgenstock.choremaster.nav.household
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import de.philgenstock.choremaster.ui.components.HouseholdList
 import kotlinx.serialization.Serializable
 
@@ -8,6 +9,6 @@ import kotlinx.serialization.Serializable
 object HouseHoldRoute
 
 @Composable
-fun HouseHoldScreen() {
-    HouseholdList()
+fun HouseHoldScreen(navController: NavController) {
+    HouseholdList(navController = navController)
 }

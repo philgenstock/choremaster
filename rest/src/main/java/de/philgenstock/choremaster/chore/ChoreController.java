@@ -14,7 +14,7 @@ public class ChoreController {
 
   private final ChoreService choreService;
 
-  @GetMapping("/household/{householdId}")
+  @GetMapping("/household/{houseHoldId}")
   public List<ChoreDto> getChoresFor(@PathVariable Long houseHoldId) {
     return choreService.getChoresFor(houseHoldId);
   }

@@ -1,6 +1,7 @@
 package de.philgenstock.choremaster.di
 
 import de.philgenstock.choremaster.data.api.AuthInterceptor
+import de.philgenstock.choremaster.data.api.ChoreApiService
 import de.philgenstock.choremaster.data.api.HouseholdApiService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -48,8 +49,10 @@ val networkModule =
                 .build()
         }
 
-        // HouseholdApiService
         single {
             get<Retrofit>().create(HouseholdApiService::class.java)
+        }
+        single {
+            get<Retrofit>().create(ChoreApiService::class.java)
         }
     }

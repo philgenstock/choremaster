@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +31,8 @@ import de.philgenstock.choremaster.nav.household.HouseHoldRoute
 import de.philgenstock.choremaster.nav.household.HouseHoldScreen
 import de.philgenstock.choremaster.nav.login.LoginRoute
 import de.philgenstock.choremaster.nav.login.LoginScreen
+import de.philgenstock.choremaster.nav.overview.HouseHoldOverviewRoute
+import de.philgenstock.choremaster.nav.overview.HouseHoldOverviewScreen
 import de.philgenstock.choremaster.ui.theme.ChoremasterTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,9 +59,9 @@ fun MainScreen() {
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { /* do something */ }) {
+                        IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
-                                imageVector = Icons.Filled.Menu,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Localized description",
                             )
                         }
@@ -85,7 +89,8 @@ fun MainScreen() {
                 Spacer(modifier = Modifier.height(16.dp))
                 NavHost(navController = navController, startDestination = LoginRoute) {
                     composable<LoginRoute> { LoginScreen(navController = navController) }
-                    composable<HouseHoldRoute> { HouseHoldScreen() }
+                    composable<HouseHoldRoute> { HouseHoldScreen(navController = navController) }
+                    composable<HouseHoldOverviewRoute> { HouseHoldOverviewScreen() }
                 }
             }
         }
