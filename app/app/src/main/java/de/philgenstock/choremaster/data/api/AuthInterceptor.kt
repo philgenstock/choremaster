@@ -25,6 +25,12 @@ class AuthInterceptor(
                 .header("Authorization", "Bearer $token")
                 .build()
 
-        return chain.proceed(newRequest)
+        val response = chain.proceed(newRequest)
+        if (response.code == 401) {
+            runBlocking {
+                tokenDataStore.clearToken()
+            }
+        }
+        return response
     }
 }
