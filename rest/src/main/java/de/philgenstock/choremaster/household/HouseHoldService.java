@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class HouseHoldService {
 
-  private final HouseHoldRepository houseHoldRepository;
   private final HouseHoldConvertService houseHoldConvertService;
   private final UserService userService;
 
