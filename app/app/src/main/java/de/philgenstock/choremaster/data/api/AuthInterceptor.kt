@@ -1,5 +1,6 @@
 package de.philgenstock.choremaster.data.api
 
+import android.util.Log
 import de.philgenstock.choremaster.data.TokenDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -26,6 +27,7 @@ class AuthInterceptor(
                 .build()
 
         val response = chain.proceed(newRequest)
+        Log.d("AuthInterceptor", "Response code: ${response.code}")
         if (response.code == 401) {
             runBlocking {
                 tokenDataStore.clearToken()

@@ -28,6 +28,7 @@ import org.koin.compose.koinInject
 fun LoginButton(
     modifier: Modifier = Modifier,
     tokenDataStore: TokenDataStore = koinInject(),
+    onLogin: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -38,6 +39,7 @@ fun LoginButton(
         Button(onClick = {
             coroutineScope.launch {
                 googleLogin(context, tokenDataStore)
+                onLogin()
             }
         }) {
             Text(text = "Login")

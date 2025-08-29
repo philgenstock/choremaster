@@ -17,20 +17,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import de.philgenstock.choremaster.data.TokenDataStore
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import de.philgenstock.choremaster.nav.household.HouseHoldRoute
+import de.philgenstock.choremaster.nav.household.HouseHoldScreen
+import de.philgenstock.choremaster.nav.login.LoginRoute
+import de.philgenstock.choremaster.nav.login.LoginScreen
 import de.philgenstock.choremaster.ui.theme.ChoremasterTheme
-import kotlin.getValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(tokenDataStore: TokenDataStore) {
+fun MainScreen() {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val navController = rememberNavController()
+
     ChoremasterTheme {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -68,7 +74,6 @@ fun MainScreen(tokenDataStore: TokenDataStore) {
                 )
             },
         ) { innerPadding ->
-            val token by tokenDataStore.getToken().collectAsState(initial = null)
 
             Column(
                 modifier =
@@ -77,11 +82,10 @@ fun MainScreen(tokenDataStore: TokenDataStore) {
                         .padding(innerPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                LoginButton(modifier = Modifier.padding(top = 16.dp))
-
                 Spacer(modifier = Modifier.height(16.dp))
-                if (!token.isNullOrEmpty()) {
-                    HouseholdList(modifier = Modifier.weight(1f))
+                NavHost(navController = navController, startDestination = LoginRoute) {
+                    composable<LoginRoute> { LoginScreen(navController = navController) }
+                    composable<HouseHoldRoute> { HouseHoldScreen() }
                 }
             }
         }
