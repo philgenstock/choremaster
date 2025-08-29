@@ -5,5 +5,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface ChoreRepository extends CrudRepository<ChoreEntity, Long> {
 
-  List<ChoreEntity> findAll();
+  List<ChoreEntity> findByHouseholdId(Long houseHoldId);
 }

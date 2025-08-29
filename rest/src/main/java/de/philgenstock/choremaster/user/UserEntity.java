@@ -16,7 +16,9 @@ public class UserEntity extends BaseEntity {
   private String name;
   private String email;
 
-  @ManyToMany(cascade = {CascadeType.ALL})
+  @ManyToMany(
+      cascade = {CascadeType.ALL},
+      fetch = FetchType.LAZY)
   @JoinTable(
       name = "users_to_household",
       joinColumns = {@JoinColumn(name = "user_id")},

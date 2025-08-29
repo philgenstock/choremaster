@@ -1,5 +1,7 @@
 package de.philgenstock.choremaster.develop;
 
+import de.philgenstock.choremaster.chore.ChoreEntity;
+import de.philgenstock.choremaster.chore.ChoreRepository;
 import de.philgenstock.choremaster.household.HouseHoldEntity;
 import de.philgenstock.choremaster.household.HouseHoldRepository;
 import de.philgenstock.choremaster.user.UserEntity;
@@ -16,6 +18,7 @@ public class DevelopTestData {
 
   private final HouseHoldRepository houseHoldRepository;
   private final UserRepository userRepository;
+  private final ChoreRepository choreRepository;
 
   @PostConstruct
   public void setupTestData() {
@@ -32,6 +35,11 @@ public class DevelopTestData {
 
       userEntity.addHouseHold(houseHoldEntity);
       userRepository.save(userEntity);
+
+      ChoreEntity choreEntity = new ChoreEntity();
+      choreEntity.setName("Putzen");
+      choreEntity.setHousehold(houseHoldEntity);
+      choreRepository.save(choreEntity);
     }
   }
 }
