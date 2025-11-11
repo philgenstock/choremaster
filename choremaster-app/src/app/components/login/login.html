@@ -1,0 +1,32 @@
+<div class="jumbotron bg-transparent text-center">
+  @if (!user()) {
+    <div class="card text-center">
+      <h6 class="card-header">Social Login Demo</h6>
+      <div class="card-block">
+        <h4 class="card-title">Not signed in</h4>
+        <p class="card-text">Sign in with</p>
+      </div>
+      <div class="card-block d-flex justify-content-center">
+        <asl-google-signin-button class="mx-5"></asl-google-signin-button>
+      </div>
+    </div>
+  }
+  @if (user(); as user) {
+    <div class="card text-center">
+      <h6 class="card-header">Social Login Demo</h6>
+      <div class="card-block"></div>
+      @if (user.imgUrl) {
+        <img
+          class="card-img-top img-responsive photo"
+          [src]="user.imgUrl"
+          />
+      }
+      <div class="card-block">
+        <h4 class="card-title">{{ user.name }}</h4>
+       
+      </div>
+
+      
+    </div>
+  }
+</div>
