@@ -2,16 +2,20 @@ import { TestBed } from '@angular/core/testing';
 
 import { AuthorizationService } from './authorization-service';
 import { AuthorizationInfo } from '../model/authorization-info';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { defaultTestProvidersWithAuth } from '../test-utils';
+import { UserControllerService } from '../client';
+import { of } from 'rxjs';
 
 describe('AuthorizationService', () => {
   let service: AuthorizationService;
   let localStorageSpy: jasmine.SpyObj<Storage>;
+  let userControllerServiceSpy: jasmine.SpyObj<UserControllerService>;
 
   const mockAuthInfo: AuthorizationInfo = {
     token: 'test-token-123',
     name: 'Test User',
-    imgUrl: 'https://example.com/avatar.jpg'
+    imgUrl: 'https://example.com/avatar.jpg',
+    email: 'test@mail.de'
   };
 
   beforeEach(() => {
@@ -21,8 +25,14 @@ describe('AuthorizationService', () => {
       writable: true
     });
 
-    TestBed.configureTestingModule({ 
-      providers: [provideZonelessChangeDetection()] 
+    userControllerServiceSpy = jasmine.createSpyObj('UserControllerService', ['login']);
+    (userControllerServiceSpy.login as jasmine.Spy).and.returnValue(of({}));
+
+    TestBed.configureTestingModule({
+      providers: [
+        ...defaultTestProvidersWithAuth,
+        { provide: UserControllerService, useValue: userControllerServiceSpy }
+      ]
     });
   });
 
@@ -30,6 +40,7 @@ describe('AuthorizationService', () => {
     localStorageSpy.getItem.calls.reset();
     localStorageSpy.setItem.calls.reset();
     localStorageSpy.removeItem.calls.reset();
+    userControllerServiceSpy.login.calls.reset();
   });
 
   describe('constructor', () => {
@@ -62,47 +73,66 @@ describe('AuthorizationService', () => {
       service = TestBed.inject(AuthorizationService);
     });
 
-    it('should set authorizationInfo signal', () => {
+    it('should set authorizationInfo signal', (done) => {
       service.setAuthorizationInfo(mockAuthInfo);
 
+      setTimeout(() => {
       expect(service.authorizationInfo()).toEqual(mockAuthInfo);
+        expect(userControllerServiceSpy.login).toHaveBeenCalledWith({
+          email: mockAuthInfo.email,
+          name: mockAuthInfo.email
+        });
+        done();
+      }, 0);
     });
 
-    it('should save authorizationInfo to localStorage', () => {
+    it('should save authorizationInfo to localStorage', (done) => {
       service.setAuthorizationInfo(mockAuthInfo);
 
-      expect(localStorageSpy.setItem).toHaveBeenCalledWith(
-        'AUTHORIZATION_INFO',
-        JSON.stringify(mockAuthInfo)
-      );
+      setTimeout(() => {
+        expect(localStorageSpy.setItem).toHaveBeenCalledWith(
+          'AUTHORIZATION_INFO',
+          JSON.stringify(mockAuthInfo)
+        );
+        done();
+      }, 0);
     });
 
-    it('should update authorizationInfo when called multiple times', () => {
+    it('should update authorizationInfo when called multiple times', (done) => {
       const firstAuth: AuthorizationInfo = {
         token: 'token-1',
         name: 'User 1',
-        imgUrl: 'url-1'
+        imgUrl: 'url-1',
+        email: 'user-1@mail.de'
       };
       const secondAuth: AuthorizationInfo = {
         token: 'token-2',
         name: 'User 2',
-        imgUrl: 'url-2'
+        imgUrl: 'url-2',
+        email: 'user-2@mail.de'
       };
 
       service.setAuthorizationInfo(firstAuth);
-      expect(service.authorizationInfo()).toEqual(firstAuth);
 
-      service.setAuthorizationInfo(secondAuth);
-      expect(service.authorizationInfo()).toEqual(secondAuth);
-      expect(localStorageSpy.setItem).toHaveBeenCalledTimes(2);
+      setTimeout(() => {
+        expect(service.authorizationInfo()).toEqual(firstAuth);
+
+        service.setAuthorizationInfo(secondAuth);
+        setTimeout(() => {
+          expect(service.authorizationInfo()).toEqual(secondAuth);
+          expect(localStorageSpy.setItem).toHaveBeenCalledTimes(2);
+          done();
+        }, 0);
+      }, 0);
     });
   });
 
   describe('removeAuthorizationInfo', () => {
-    beforeEach(() => {
+    beforeEach((done) => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
       service.setAuthorizationInfo(mockAuthInfo);
+      setTimeout(() => done(), 0);
     });
 
     it('should set authorizationInfo signal to null', () => {
@@ -139,22 +169,29 @@ describe('AuthorizationService', () => {
       expect(signal()).toBeNull();
     });
 
-    it('should return signal that reflects current authorizationInfo', () => {
+    it('should return signal that reflects current authorizationInfo', (done) => {
       service.setAuthorizationInfo(mockAuthInfo);
       const signal = service.getAuthorizationInfo();
 
-      expect(signal()).toEqual(mockAuthInfo);
+      setTimeout(() => {
+        expect(signal()).toEqual(mockAuthInfo);
+        done();
+      }, 0);
     });
 
-    it('should return signal that updates when authorizationInfo changes', () => {
+    it('should return signal that updates when authorizationInfo changes', (done) => {
       const signal = service.getAuthorizationInfo();
       expect(signal()).toBeNull();
 
       service.setAuthorizationInfo(mockAuthInfo);
-      expect(signal()).toEqual(mockAuthInfo);
 
-      service.removeAuthorizationInfo();
-      expect(signal()).toBeNull();
+      setTimeout(() => {
+        expect(signal()).toEqual(mockAuthInfo);
+
+        service.removeAuthorizationInfo();
+        expect(signal()).toBeNull();
+        done();
+      }, 0);
     });
   });
 });

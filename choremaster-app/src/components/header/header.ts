@@ -4,6 +4,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { AuthorizationService } from '../../service/authorization-service';
 import { GoogleSigninButtonDirective } from '@abacritt/angularx-social-login';
+import { UserControllerService } from '../../client';
 
 @Component({
   selector: 'app-header',
