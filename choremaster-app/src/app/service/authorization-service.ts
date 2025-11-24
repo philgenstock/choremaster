@@ -1,7 +1,8 @@
 import { inject, Injectable, Signal, signal } from '@angular/core';
-import { AuthorizationInfo } from '../model/authorization-info';
+import { AuthorizationInfo } from '../../model/authorization-info';
 import { SocialAuthService } from '@abacritt/angularx-social-login';
-import { UserControllerService, UserDto } from '../client';
+import { UserControllerService } from '../../client';
+import { HouseholdService } from './household-service';
 
 @Injectable({
   providedIn: 'root',
@@ -9,8 +10,10 @@ import { UserControllerService, UserDto } from '../client';
 export class AuthorizationService {
 
   authorizationInfo = signal<AuthorizationInfo | null>(null)
-  socialAuthService = inject(SocialAuthService)
-  userControllerService = inject(UserControllerService)
+  private socialAuthService = inject(SocialAuthService)
+  private userControllerService = inject(UserControllerService)
+  private householdService = inject(HouseholdService)
+  
 
   constructor() {
     const localStorageAuthorization = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -36,19 +39,18 @@ export class AuthorizationService {
   }
 
   setAuthorizationInfo(authorizationInfo: AuthorizationInfo) {
-     this.userControllerService.login(
-      {email: authorizationInfo.email,
-        name: authorizationInfo.email,
-      }
-    ).subscribe(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(authorizationInfo))
-    this.authorizationInfo.set(authorizationInfo)
+    
+    this.userControllerService.login(authorizationInfo.token).subscribe(() => {
+      this.authorizationInfo.set(authorizationInfo)
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(authorizationInfo))
+      this.householdService.loadHouseholds()
     })
   }
 
   removeAuthorizationInfo() {
     localStorage.removeItem(LOCAL_STORAGE_KEY)
     this.authorizationInfo.set(null)
+    this.householdService.resetHouseholds()
   }
 
   getAuthorizationInfo(): Signal<AuthorizationInfo | null> {

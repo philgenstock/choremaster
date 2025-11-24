@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { AuthorizationService } from '../../service/authorization-service';
+import { AuthorizationService } from '../../app/service/authorization-service';
 import { GoogleSigninButtonDirective } from '@abacritt/angularx-social-login';
 import { UserControllerService } from '../../client';
 
