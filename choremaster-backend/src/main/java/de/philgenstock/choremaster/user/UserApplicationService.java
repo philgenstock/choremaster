@@ -9,8 +9,8 @@ public class UserApplicationService {
 
     private final UserService userService;
 
-    public void login(UserDto userDto) {
-        userService.login(userDto);
+    public void login(String token) {
+        userService.login(token);
     }
 
 }

@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/api/")
 public class UserController {
 
     private final UserApplicationService userApplicationService;
 
-    @PostMapping("/login")
-    public void login(@RequestBody UserDto userDto) {
-        userApplicationService.login(userDto);
+    @PostMapping("public/login")
+    public void login(@RequestBody String token) {
+        userApplicationService.login(token);
     }
 }

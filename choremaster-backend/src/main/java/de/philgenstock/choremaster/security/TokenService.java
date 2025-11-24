@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import de.philgenstock.choremaster.user.UserDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,21 @@ public class TokenService {
 
     public TokenService(@Value("${google.oauth.client-id}") String clientId) {
         this.verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-            .setAudience(Collections.singletonList(clientId))
-            .build();
+                .setAudience(Collections.singletonList(clientId))
+                .build();
+    }
+
+    public UserDto getUserFromToken(String token) {
+        try {
+            GoogleIdToken idToken = verifier.verify(token);
+            if (idToken != null) {
+                GoogleIdToken.Payload payload = idToken.getPayload();
+                return new UserDto((String) payload.get("name"), payload.getEmail());
+            }
+        } catch (Exception e) {
+            return null;
+        }
+        return null;
     }
 
     public String extractEmailFromToken(String token) {

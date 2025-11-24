@@ -22,12 +22,21 @@ public class User extends BaseEntity {
 
     @ManyToMany
     @JoinTable(
-        name = "household_members",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "household_id")
+            name = "household_members",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "household_id")
     )
     private Set<Household> households = new HashSet<>();
 
     public User() {
+    }
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public void addHousehold(Household household) {
+        this.households.add(household);
     }
 }

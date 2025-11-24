@@ -3,10 +3,9 @@ package de.philgenstock.choremaster.user;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-
 import static de.philgenstock.choremaster.user.UserBuilder.aUser;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class UserConvertServiceTest {
 
@@ -30,7 +29,6 @@ class UserConvertServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(1L, result.id());
         assertEquals("John Doe", result.name());
         assertEquals("john.doe@example.com", result.email());
     }
@@ -39,14 +37,13 @@ class UserConvertServiceTest {
     @Test
     void toNewUser_shouldConvertUserDtoToUser() {
         // Given
-        UserDto userDto = new UserDto(null, "Alice Smith", "alice.smith@example.com");
+        UserDto userDto = new UserDto("Alice Smith", "alice.smith@example.com");
 
         // When
         User result = userConvertService.toNewUser(userDto);
 
         // Then
         assertNotNull(result);
-        assertNull(result.getId());
         assertEquals("Alice Smith", result.getName());
         assertEquals("alice.smith@example.com", result.getEmail());
     }
