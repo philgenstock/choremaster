@@ -1,18 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
 import { authInterceptor } from './auth.interceptor';
-import { AuthorizationService } from './authorization-service';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { AuthorizationInfo } from '../../model/authorization-info';
 import { of } from 'rxjs';
 import { AuthorizationInfoService } from './authorization-info-service';
 
 describe('authInterceptor', () => {
-  let mockAuthService: Partial<AuthorizationInfoService>;
+  let mockAuthInfoService: Partial<AuthorizationInfoService>;
   let mockNext: jasmine.Spy<HttpHandlerFn>;
 
   beforeEach(() => {
-    mockAuthService = {
+    mockAuthInfoService = {
       authorizationInfo: signal<AuthorizationInfo | null>(null)
     };
 
@@ -21,7 +20,7 @@ describe('authInterceptor', () => {
     TestBed.configureTestingModule({
       providers: [
         provideZonelessChangeDetection(),
-        { provide: AuthorizationService, useValue: mockAuthService }
+        { provide: AuthorizationInfoService, useValue: mockAuthInfoService }
       ]
     });
   });
@@ -34,7 +33,7 @@ describe('authInterceptor', () => {
       email: 'test@example.com',
       imgUrl: 'https://example.com/image.jpg'
     };
-    mockAuthService.authorizationInfo!.set(authInfo);
+    mockAuthInfoService.authorizationInfo!.set(authInfo);
 
     const request = new HttpRequest('GET', '/api/test');
 
@@ -52,7 +51,7 @@ describe('authInterceptor', () => {
 
   it('should not add Authorization header when token is null', () => {
     // Given
-    mockAuthService.authorizationInfo!.set(null);
+    mockAuthInfoService.authorizationInfo!.set(null);
     const request = new HttpRequest('GET', '/api/test');
 
     // When

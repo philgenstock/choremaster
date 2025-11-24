@@ -5,10 +5,12 @@ import { AuthorizationInfo } from '../../model/authorization-info';
 import { defaultTestProvidersWithAuth } from '../../test-utils';
 import { UserControllerService } from '../../client';
 import { HouseholdService } from './household-service';
+import { AuthorizationInfoService } from './authorization-info-service';
 import { Observable, of } from 'rxjs';
 
 describe('AuthorizationService', () => {
   let service: AuthorizationService;
+  let authorizationInfoService: AuthorizationInfoService;
   let localStorageSpy: jasmine.SpyObj<Storage>;
   let userControllerServiceSpy: jasmine.SpyObj<UserControllerService>;
   let householdServiceSpy: jasmine.SpyObj<HouseholdService>;
@@ -60,16 +62,18 @@ describe('AuthorizationService', () => {
     it('should initialize with null authorizationInfo when localStorage is empty', () => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
 
-      expect(service.authorizationInfo()).toBeNull();
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
       expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
     });
 
     it('should load authorizationInfo from localStorage on initialization', () => {
       localStorageSpy.getItem.and.returnValue(JSON.stringify(mockAuthInfo));
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
 
-      expect(service.authorizationInfo()).toEqual(mockAuthInfo);
+      expect(authorizationInfoService.authorizationInfo()).toEqual(mockAuthInfo);
       expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
     });
   });
@@ -78,17 +82,15 @@ describe('AuthorizationService', () => {
     beforeEach(() => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
     });
 
     it('should set authorizationInfo signal', (done) => {
       service.setAuthorizationInfo(mockAuthInfo);
 
       setTimeout(() => {
-      expect(service.authorizationInfo()).toEqual(mockAuthInfo);
-        expect(userControllerServiceSpy.login).toHaveBeenCalledWith({
-          email: mockAuthInfo.email,
-          name: mockAuthInfo.email
-        });
+      expect(authorizationInfoService.authorizationInfo()).toEqual(mockAuthInfo);
+        expect(userControllerServiceSpy.login).toHaveBeenCalledWith(mockAuthInfo.token);
         done();
       }, 0);
     });
@@ -160,11 +162,11 @@ describe('AuthorizationService', () => {
       service.setAuthorizationInfo(firstAuth);
 
       setTimeout(() => {
-        expect(service.authorizationInfo()).toEqual(firstAuth);
+        expect(authorizationInfoService.authorizationInfo()).toEqual(firstAuth);
 
         service.setAuthorizationInfo(secondAuth);
         setTimeout(() => {
-          expect(service.authorizationInfo()).toEqual(secondAuth);
+          expect(authorizationInfoService.authorizationInfo()).toEqual(secondAuth);
           expect(localStorageSpy.setItem).toHaveBeenCalledTimes(2);
           done();
         }, 0);
@@ -176,6 +178,7 @@ describe('AuthorizationService', () => {
     beforeEach((done) => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
       service.setAuthorizationInfo(mockAuthInfo);
       setTimeout(() => done(), 0);
     });
@@ -183,7 +186,7 @@ describe('AuthorizationService', () => {
     it('should set authorizationInfo signal to null', () => {
       service.removeAuthorizationInfo();
 
-      expect(service.authorizationInfo()).toBeNull();
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
     });
 
     it('should remove authorizationInfo from localStorage', () => {
@@ -194,10 +197,10 @@ describe('AuthorizationService', () => {
 
     it('should handle removing when already null', () => {
       service.removeAuthorizationInfo();
-      expect(service.authorizationInfo()).toBeNull();
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
 
       service.removeAuthorizationInfo();
-      expect(service.authorizationInfo()).toBeNull();
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
       expect(localStorageSpy.removeItem).toHaveBeenCalledTimes(2);
     });
 
@@ -219,6 +222,7 @@ describe('AuthorizationService', () => {
     beforeEach(() => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
     });
 
     it('should return the authorizationInfo signal', () => {

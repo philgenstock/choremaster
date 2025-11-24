@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HouseholdSelect } from './household-select';
+import { defaultTestProviders } from '../../../test-utils';
 
 describe('HouseholdSelect', () => {
   let component: HouseholdSelect;
@@ -8,7 +9,8 @@ describe('HouseholdSelect', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [HouseholdSelect]
+      imports: [HouseholdSelect],
+      providers: [defaultTestProviders],
     })
     .compileComponents();
 
