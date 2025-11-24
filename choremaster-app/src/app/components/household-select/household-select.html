@@ -1,0 +1,7 @@
+<mat-select>
+    @for (household of householdService.households(); track household.id) {
+        <mat-option [value]="household.id">
+            {{household.name}}
+        </mat-option>
+    }    
+</mat-select>

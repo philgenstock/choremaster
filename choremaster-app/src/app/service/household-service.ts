@@ -12,7 +12,8 @@ export class HouseholdService {
 
   loadHouseholds() {
     this.householdControllerService.getAllHouseholdForCurrentUser()
-      .subscribe(result => this.households.set(result))
+      .subscribe(result => {console.debug(result)
+        this.households.set(result)})
   }
 
   resetHouseholds() {

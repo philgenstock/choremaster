@@ -1,10 +1,10 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { AuthorizationService } from './authorization-service';
+import { AuthorizationInfoService } from './authorization-info-service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const authService = inject(AuthorizationService);
-  const authInfo = authService.authorizationInfo();
+  const authInfoService = inject(AuthorizationInfoService);
+  const authInfo = authInfoService.authorizationInfo();
 
   if (authInfo?.token) {
     const clonedRequest = req.clone({

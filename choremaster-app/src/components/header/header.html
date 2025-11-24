@@ -1,17 +1,18 @@
 <mat-toolbar class="header-toolbar" color="primary">
-  <button matIconButton class="example-icon">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <span>Choremaster</span>
+  <span class="app-title">Choremaster</span>
   <span class="spacer"></span>
-  @if(authorizationService.authorizationInfo(); as authorizationInfo) {
-      {{authorizationInfo.name}}
-      <button matIconButton class="example-icon favorite-icon" aria-label="Example icon-button with heart icon">
-        <mat-icon (click)="logout()">logout</mat-icon>
-      </button>
+  @if(authorizationInfoService.authorizationInfo(); as authorizationInfo) {
+      <div class="user-section">
+        <app-household-select class="household-select"></app-household-select>
+        <div class="user-info">
+          <span class="user-name">{{authorizationInfo.name}}</span>
+        </div>
+        <button mat-icon-button class="logout-button" (click)="logout()" aria-label="Logout">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </div>
   }
   @else {
-      <asl-google-signin-button class="mx-5"></asl-google-signin-button>
+      <asl-google-signin-button class="signin-button"></asl-google-signin-button>
   }
-  
 </mat-toolbar>

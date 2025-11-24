@@ -5,9 +5,10 @@ import { AuthorizationService } from './authorization-service';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { AuthorizationInfo } from '../../model/authorization-info';
 import { of } from 'rxjs';
+import { AuthorizationInfoService } from './authorization-info-service';
 
 describe('authInterceptor', () => {
-  let mockAuthService: Partial<AuthorizationService>;
+  let mockAuthService: Partial<AuthorizationInfoService>;
   let mockNext: jasmine.Spy<HttpHandlerFn>;
 
   beforeEach(() => {
