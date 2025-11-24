@@ -9,9 +9,8 @@
  */
 
 
-export interface UserDto { 
+export interface HouseholdDto { 
     id?: number;
     name?: string;
-    email?: string;
 }
 
