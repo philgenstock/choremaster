@@ -1,5 +1,6 @@
 export interface AuthorizationInfo {
-    token: String;
-    name: String | undefined;
-    imgUrl: String | undefined;
+    token: string;
+    name: string | undefined;
+    email: string
+    imgUrl: string | undefined;
 }
