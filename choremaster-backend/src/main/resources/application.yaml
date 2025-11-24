@@ -21,3 +21,7 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+
+google:
+  oauth:
+    client-id: 226274128441-0e2re0vo3p5mnf4e2nhok8m2fipncjh5.apps.googleusercontent.com

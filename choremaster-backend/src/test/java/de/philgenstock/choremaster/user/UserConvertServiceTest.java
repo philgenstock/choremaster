@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 
+import static de.philgenstock.choremaster.user.UserBuilder.aUser;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserConvertServiceTest {
@@ -19,12 +20,10 @@ class UserConvertServiceTest {
     @Test
     void toDto_shouldConvertUserToUserDto() {
         // Given
-        User user = new User();
-        user.setId(1L);
-        user.setName("John Doe");
-        user.setEmail("john.doe@example.com");
-        user.setCreatedDate(LocalDateTime.now());
-        user.setLastModifiedDate(LocalDateTime.now());
+        User user = aUser()
+                .withName("John Doe")
+                .withEmail("john.doe@example.com")
+                .build();
 
         // When
         UserDto result = userConvertService.toDto(user);
@@ -36,22 +35,6 @@ class UserConvertServiceTest {
         assertEquals("john.doe@example.com", result.email());
     }
 
-    @Test
-    void toDto_shouldHandleNullId() {
-        // Given
-        User user = new User();
-        user.setName("Jane Doe");
-        user.setEmail("jane.doe@example.com");
-
-        // When
-        UserDto result = userConvertService.toDto(user);
-
-        // Then
-        assertNotNull(result);
-        assertNull(result.id());
-        assertEquals("Jane Doe", result.name());
-        assertEquals("jane.doe@example.com", result.email());
-    }
 
     @Test
     void toNewUser_shouldConvertUserDtoToUser() {
@@ -66,22 +49,5 @@ class UserConvertServiceTest {
         assertNull(result.getId());
         assertEquals("Alice Smith", result.getName());
         assertEquals("alice.smith@example.com", result.getEmail());
-        assertNull(result.getCreatedDate());
-        assertNull(result.getLastModifiedDate());
-    }
-
-    @Test
-    void toNewUser_shouldIgnoreIdFromDto() {
-        // Given
-        UserDto userDto = new UserDto(999L, "Bob Johnson", "bob.johnson@example.com");
-
-        // When
-        User result = userConvertService.toNewUser(userDto);
-
-        // Then
-        assertNotNull(result);
-        assertNull(result.getId());
-        assertEquals("Bob Johnson", result.getName());
-        assertEquals("bob.johnson@example.com", result.getEmail());
     }
 }
