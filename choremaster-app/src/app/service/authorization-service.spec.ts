@@ -1,15 +1,19 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AuthorizationService } from './authorization-service';
-import { AuthorizationInfo } from '../model/authorization-info';
-import { defaultTestProvidersWithAuth } from '../test-utils';
-import { UserControllerService } from '../client';
-import { of } from 'rxjs';
+import { AuthorizationInfo } from '../../model/authorization-info';
+import { defaultTestProvidersWithAuth } from '../../test-utils';
+import { UserControllerService } from '../../client';
+import { HouseholdService } from './household-service';
+import { AuthorizationInfoService } from './authorization-info-service';
+import { Observable, of } from 'rxjs';
 
 describe('AuthorizationService', () => {
   let service: AuthorizationService;
+  let authorizationInfoService: AuthorizationInfoService;
   let localStorageSpy: jasmine.SpyObj<Storage>;
   let userControllerServiceSpy: jasmine.SpyObj<UserControllerService>;
+  let householdServiceSpy: jasmine.SpyObj<HouseholdService>;
 
   const mockAuthInfo: AuthorizationInfo = {
     token: 'test-token-123',
@@ -28,10 +32,13 @@ describe('AuthorizationService', () => {
     userControllerServiceSpy = jasmine.createSpyObj('UserControllerService', ['login']);
     (userControllerServiceSpy.login as jasmine.Spy).and.returnValue(of({}));
 
+    householdServiceSpy = jasmine.createSpyObj('HouseholdService', ['loadHouseholds', 'resetHouseholds']);
+
     TestBed.configureTestingModule({
       providers: [
         ...defaultTestProvidersWithAuth,
-        { provide: UserControllerService, useValue: userControllerServiceSpy }
+        { provide: UserControllerService, useValue: userControllerServiceSpy },
+        { provide: HouseholdService, useValue: householdServiceSpy }
       ]
     });
   });
@@ -41,6 +48,8 @@ describe('AuthorizationService', () => {
     localStorageSpy.setItem.calls.reset();
     localStorageSpy.removeItem.calls.reset();
     userControllerServiceSpy.login.calls.reset();
+    householdServiceSpy.loadHouseholds.calls.reset();
+    householdServiceSpy.resetHouseholds.calls.reset();
   });
 
   describe('constructor', () => {
@@ -53,16 +62,18 @@ describe('AuthorizationService', () => {
     it('should initialize with null authorizationInfo when localStorage is empty', () => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
 
-      expect(service.authorizationInfo()).toBeNull();
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
       expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
     });
 
     it('should load authorizationInfo from localStorage on initialization', () => {
       localStorageSpy.getItem.and.returnValue(JSON.stringify(mockAuthInfo));
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
 
-      expect(service.authorizationInfo()).toEqual(mockAuthInfo);
+      expect(authorizationInfoService.authorizationInfo()).toEqual(mockAuthInfo);
       expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
     });
   });
@@ -71,17 +82,15 @@ describe('AuthorizationService', () => {
     beforeEach(() => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
     });
 
     it('should set authorizationInfo signal', (done) => {
       service.setAuthorizationInfo(mockAuthInfo);
 
       setTimeout(() => {
-      expect(service.authorizationInfo()).toEqual(mockAuthInfo);
-        expect(userControllerServiceSpy.login).toHaveBeenCalledWith({
-          email: mockAuthInfo.email,
-          name: mockAuthInfo.email
-        });
+      expect(authorizationInfoService.authorizationInfo()).toEqual(mockAuthInfo);
+        expect(userControllerServiceSpy.login).toHaveBeenCalledWith(mockAuthInfo.token);
         done();
       }, 0);
     });
@@ -94,6 +103,44 @@ describe('AuthorizationService', () => {
           'AUTHORIZATION_INFO',
           JSON.stringify(mockAuthInfo)
         );
+        done();
+      }, 0);
+    });
+
+    it('should call loadHouseholds on household service when setting authorization info', (done) => {
+      service.setAuthorizationInfo(mockAuthInfo);
+
+      setTimeout(() => {
+        expect(householdServiceSpy.loadHouseholds).toHaveBeenCalledTimes(1);
+        done();
+      }, 0);
+    });
+
+    it('should call login and then loadHouseholds in correct order', (done) => {
+      let loginCalled = false;
+      (userControllerServiceSpy.login as jasmine.Spy).and.returnValue(
+        of({}).pipe(
+          // Use tap to verify order
+          (source) => {
+            return new Observable(observer => {
+              source.subscribe({
+                next: (value) => {
+                  loginCalled = true;
+                  observer.next(value);
+                },
+                error: (err) => observer.error(err),
+                complete: () => observer.complete()
+              });
+            });
+          }
+        )
+      );
+
+      service.setAuthorizationInfo(mockAuthInfo);
+
+      setTimeout(() => {
+        expect(loginCalled).toBe(true);
+        expect(householdServiceSpy.loadHouseholds).toHaveBeenCalledTimes(1);
         done();
       }, 0);
     });
@@ -115,11 +162,11 @@ describe('AuthorizationService', () => {
       service.setAuthorizationInfo(firstAuth);
 
       setTimeout(() => {
-        expect(service.authorizationInfo()).toEqual(firstAuth);
+        expect(authorizationInfoService.authorizationInfo()).toEqual(firstAuth);
 
         service.setAuthorizationInfo(secondAuth);
         setTimeout(() => {
-          expect(service.authorizationInfo()).toEqual(secondAuth);
+          expect(authorizationInfoService.authorizationInfo()).toEqual(secondAuth);
           expect(localStorageSpy.setItem).toHaveBeenCalledTimes(2);
           done();
         }, 0);
@@ -131,6 +178,7 @@ describe('AuthorizationService', () => {
     beforeEach((done) => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
       service.setAuthorizationInfo(mockAuthInfo);
       setTimeout(() => done(), 0);
     });
@@ -138,7 +186,7 @@ describe('AuthorizationService', () => {
     it('should set authorizationInfo signal to null', () => {
       service.removeAuthorizationInfo();
 
-      expect(service.authorizationInfo()).toBeNull();
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
     });
 
     it('should remove authorizationInfo from localStorage', () => {
@@ -149,11 +197,24 @@ describe('AuthorizationService', () => {
 
     it('should handle removing when already null', () => {
       service.removeAuthorizationInfo();
-      expect(service.authorizationInfo()).toBeNull();
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
 
       service.removeAuthorizationInfo();
-      expect(service.authorizationInfo()).toBeNull();
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
       expect(localStorageSpy.removeItem).toHaveBeenCalledTimes(2);
+    });
+
+    it('should call resetHouseholds on household service when removing authorization info', () => {
+      service.removeAuthorizationInfo();
+
+      expect(householdServiceSpy.resetHouseholds).toHaveBeenCalledTimes(1);
+    });
+
+    it('should call resetHouseholds every time removeAuthorizationInfo is called', () => {
+      service.removeAuthorizationInfo();
+      service.removeAuthorizationInfo();
+
+      expect(householdServiceSpy.resetHouseholds).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -161,6 +222,7 @@ describe('AuthorizationService', () => {
     beforeEach(() => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
     });
 
     it('should return the authorizationInfo signal', () => {

@@ -1,13 +1,15 @@
 package de.philgenstock.choremaster.user;
 
+import de.philgenstock.choremaster.household.Household;
 import de.philgenstock.choremaster.persistence.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@EqualsAndHashCode(callSuper = true)
+import java.util.HashSet;
+import java.util.Set;
+
+@EqualsAndHashCode(callSuper = true, exclude = "households")
 @Entity
 @Table(name = "users")
 @Data
@@ -18,6 +20,23 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
+    @ManyToMany
+    @JoinTable(
+            name = "household_members",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "household_id")
+    )
+    private Set<Household> households = new HashSet<>();
+
     public User() {
+    }
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public void addHousehold(Household household) {
+        this.households.add(household);
     }
 }

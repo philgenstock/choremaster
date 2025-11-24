@@ -11,14 +11,15 @@ import {
   SOCIAL_AUTH_CONFIG,
   SocialAuthServiceConfig,
 } from '@abacritt/angularx-social-login';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideApi } from '../client';
+import { authInterceptor } from './service/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([authInterceptor])),
     provideApi('http://localhost:8080'),
     provideRouter(routes),
     {

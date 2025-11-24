@@ -3,18 +3,63 @@
 }
 
 .header-toolbar {
-  /* Use Material theme CSS variables for proper contrast */
   background-color: var(--mat-sys-primary);
   color: var(--mat-sys-on-primary);
   min-height: 64px;
-  padding: 0 16px;
+  padding: 0 24px;
   position: sticky;
   top: 0;
   z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
-/* Grow to push right-side actions */
+.app-title {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
 .spacer {
   flex: 1 1 auto;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.household-select {
+  display: flex;
+  align-items: center;
+  min-width: 200px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.logout-button {
+  color: var(--mat-sys-on-primary);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.signin-button {
+  margin: 0 8px;
 }

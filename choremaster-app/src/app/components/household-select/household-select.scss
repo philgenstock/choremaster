@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+mat-select {
+  min-width: 200px;
+  font-size: 16px;
+  font-weight: bold;
+  
+  color: var(--mat-sys-on-primary);
+
+  ::ng-deep .mat-mdc-select-value {
+    color: var(--mat-sys-on-primary);
+  }
+
+  ::ng-deep .mat-mdc-select-arrow {
+    color: var(--mat-sys-on-primary);
+  }
+}
