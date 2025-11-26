@@ -1,10 +1,17 @@
 
-
-@for (chore of choreService.chores(); track chore.id) {
-    <mat-card appearance="outlined">
-        <mat-card-title>{{chore.name}}</mat-card-title>
-        <mat-card-actions>
-            <button matButton (click)="deleteChore(chore)"><mat-icon>delete_forever</mat-icon></button>
-        </mat-card-actions>
-    </mat-card>
+@if (householdService.selectedHouseholdId()) {
+    @for (chore of choreService.chores(); track chore.id) {
+        <mat-card appearance="outlined">
+            <mat-card-title>{{chore.name}}</mat-card-title>
+            <mat-card-actions>
+                <button matButton (click)="deleteChore(chore)"><mat-icon>delete_forever</mat-icon></button>
+            </mat-card-actions>
+        </mat-card>
+    }
+    <div style="margin-bottom: 20px;">
+        <button mat-raised-button color="primary" (click)="openAddChoreDialog()">
+            <mat-icon>add</mat-icon>
+                Add Chore
+         </button>
+    </div>
 }
