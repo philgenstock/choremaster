@@ -8,6 +8,7 @@ import { Observable } from 'rxjs';
 export class HouseholdService {
 
   households = signal<HouseholdDto[]>([])
+  selectedHouseholdId = signal<number | null>(null);
 
   private householdControllerService = inject(HouseholdControllerService)
 
@@ -16,6 +17,8 @@ export class HouseholdService {
       .subscribe(result => {console.debug(result)
         this.households.set(result)})
   }
+
+  
 
   resetHouseholds() {
     this.households.set([])

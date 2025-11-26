@@ -1,4 +1,4 @@
-<mat-select [value]="selectedHouseholdId()" (selectionChange)="onSelectionChange($event.value)">
+<mat-select [value]="householdService.selectedHouseholdId()" (selectionChange)="onSelectionChange($event.value)">
     @for (household of householdService.households(); track household.id) {
         <mat-option [value]="household.id">
             {{household.name}}
