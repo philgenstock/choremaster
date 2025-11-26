@@ -9,6 +9,7 @@ configuration.ts
 encoder.ts
 git_push.sh
 index.ts
+model/createHouseholdRequest.ts
 model/householdDto.ts
 model/models.ts
 param.ts
