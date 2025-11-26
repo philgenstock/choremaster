@@ -25,37 +25,40 @@ class ChoreServiceTest {
     private ChoreService choreService;
 
     @Test
-    void getAllChores_shouldReturnAllChores() {
+    void getChoresByHousehold_shouldReturnChoresForHousehold() {
         // Given
+        Household household = aHousehold().build();
         Chore chore1 = aChore()
                 .withName("Clean the kitchen")
-                .withHousehold(aHousehold().build())
+                .withHousehold(household)
                 .build();
         Chore chore2 = aChore()
                 .withName("Do the laundry")
-                .withHousehold(aHousehold().build())
+                .withHousehold(household)
                 .build();
 
         List<Chore> chores = List.of(chore1, chore2);
-        when(choreRepository.findAll()).thenReturn(chores);
+        when(choreRepository.findByHousehold(household)).thenReturn(chores);
 
         // When
-        List<Chore> result = choreService.getAllChores();
+        List<Chore> result = choreService.getChoresByHousehold(household);
 
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertTrue(result.contains(chore1));
         assertTrue(result.contains(chore2));
+        verify(choreRepository, times(1)).findByHousehold(household);
     }
 
     @Test
-    void getAllChores_shouldReturnEmptyListWhenNoChoresExist() {
+    void getChoresByHousehold_shouldReturnEmptyListWhenNoChoresExistForHousehold() {
         // Given
-        when(choreRepository.findAll()).thenReturn(List.of());
+        Household household = aHousehold().build();
+        when(choreRepository.findByHousehold(household)).thenReturn(List.of());
 
         // When
-        List<Chore> result = choreService.getAllChores();
+        List<Chore> result = choreService.getChoresByHousehold(household);
 
         // Then
         assertNotNull(result);

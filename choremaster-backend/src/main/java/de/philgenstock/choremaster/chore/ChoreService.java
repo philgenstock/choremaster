@@ -12,8 +12,8 @@ public class ChoreService {
 
     private final ChoreRepository choreRepository;
 
-    public List<Chore> getAllChores() {
-        return choreRepository.findAll();
+    public List<Chore> getChoresByHousehold(Household household) {
+        return choreRepository.findByHousehold(household);
     }
 
     public Chore createChore(String name, Household household) {

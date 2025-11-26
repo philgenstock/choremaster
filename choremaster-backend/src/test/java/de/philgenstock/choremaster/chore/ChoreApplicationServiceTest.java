@@ -32,46 +32,68 @@ class ChoreApplicationServiceTest {
     private ChoreApplicationService choreApplicationService;
 
     @Test
-    void getAllChores_shouldReturnAllChoresAsDtos() {
+    void getChoresByHouseholdId_shouldReturnChoresForHouseholdAsDtos() {
         // Given
+        Long householdId = 10L;
+        Household household = aHousehold().withId(householdId).build();
         Chore chore1 = aChore()
                 .withName("Clean the kitchen")
-                .withHousehold(aHousehold().withId(10L).build())
+                .withHousehold(household)
                 .build();
         Chore chore2 = aChore()
                 .withId(2L)
                 .withName("Do the laundry")
-                .withHousehold(aHousehold().withId(10L).build())
+                .withHousehold(household)
                 .build();
 
         ChoreDto choreDto1 = new ChoreDto(1L, "Clean the kitchen");
         ChoreDto choreDto2 = new ChoreDto(2L, "Do the laundry");
 
-        when(choreService.getAllChores()).thenReturn(List.of(chore1, chore2));
+        when(householdRepository.findById(householdId)).thenReturn(Optional.of(household));
+        when(choreService.getChoresByHousehold(household)).thenReturn(List.of(chore1, chore2));
         when(choreConvertService.toDto(chore1)).thenReturn(choreDto1);
         when(choreConvertService.toDto(chore2)).thenReturn(choreDto2);
 
         // When
-        List<ChoreDto> result = choreApplicationService.getAllChores();
+        List<ChoreDto> result = choreApplicationService.getChoresByHouseholdId(householdId);
 
         // Then
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(choreDto1, result.get(0));
         assertEquals(choreDto2, result.get(1));
+        verify(householdRepository, times(1)).findById(householdId);
+        verify(choreService, times(1)).getChoresByHousehold(household);
     }
 
     @Test
-    void getAllChores_shouldReturnEmptyListWhenNoChoresExist() {
+    void getChoresByHouseholdId_shouldReturnEmptyListWhenNoChoresExistForHousehold() {
         // Given
-        when(choreService.getAllChores()).thenReturn(List.of());
+        Long householdId = 10L;
+        Household household = aHousehold().withId(householdId).build();
+        when(householdRepository.findById(householdId)).thenReturn(Optional.of(household));
+        when(choreService.getChoresByHousehold(household)).thenReturn(List.of());
 
         // When
-        List<ChoreDto> result = choreApplicationService.getAllChores();
+        List<ChoreDto> result = choreApplicationService.getChoresByHouseholdId(householdId);
 
         // Then
         assertNotNull(result);
         assertTrue(result.isEmpty());
+        verify(householdRepository, times(1)).findById(householdId);
+        verify(choreService, times(1)).getChoresByHousehold(household);
+    }
+
+    @Test
+    void getChoresByHouseholdId_shouldThrowExceptionWhenHouseholdNotFound() {
+        // Given
+        Long householdId = 10L;
+        when(householdRepository.findById(householdId)).thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(IllegalArgumentException.class, () -> choreApplicationService.getChoresByHouseholdId(householdId));
+        verify(householdRepository, times(1)).findById(householdId);
+        verify(choreService, never()).getChoresByHousehold(any());
     }
 
     @Test

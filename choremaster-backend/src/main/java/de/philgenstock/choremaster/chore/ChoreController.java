@@ -14,8 +14,8 @@ public class ChoreController {
     private final ChoreApplicationService choreApplicationService;
 
     @GetMapping(value = "chores", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<ChoreDto> getAllChores() {
-        return choreApplicationService.getAllChores();
+    public List<ChoreDto> getChoresByHousehold(@RequestParam Long householdId) {
+        return choreApplicationService.getChoresByHouseholdId(householdId);
     }
 
     @PostMapping(value = "create", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -16,8 +16,10 @@ public class ChoreApplicationService {
     private final ChoreConvertService choreConvertService;
     private final HouseholdRepository householdRepository;
 
-    public List<ChoreDto> getAllChores() {
-        return choreService.getAllChores().stream()
+    public List<ChoreDto> getChoresByHouseholdId(Long householdId) {
+        Household household = householdRepository.findById(householdId)
+                .orElseThrow(() -> new IllegalArgumentException("Household not found with id: " + householdId));
+        return choreService.getChoresByHousehold(household).stream()
                 .map(choreConvertService::toDto)
                 .toList();
     }
