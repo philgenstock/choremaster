@@ -14,12 +14,13 @@ import {
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideApi } from '../client';
 import { authInterceptor } from './service/auth.interceptor';
+import { httpErrorInterceptor } from './service/http-error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, httpErrorInterceptor])),
     provideApi('http://localhost:8080'),
     provideRouter(routes),
     {
