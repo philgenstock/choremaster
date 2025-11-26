@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Create Household</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Household Name</mat-label>
+    <input matInput [(ngModel)]="householdName" placeholder="Enter household name" />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onConfirm()" [disabled]="!householdName.trim()">
+    Create
+  </button>
+</mat-dialog-actions>
