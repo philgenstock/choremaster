@@ -24,7 +24,11 @@ export class ChoreService {
   }
 
   loadChores() {
-    this.choreControllerService.getAllChores()
-    .subscribe(chores => this.chores.set(chores))
+    const householdId = this.householdService.selectedHouseholdId();
+    if(!householdId) {
+      return
+    }
+    this.choreControllerService.getChoresByHousehold(householdId)
+      .subscribe(chores => this.chores.set(chores))
   }
 }

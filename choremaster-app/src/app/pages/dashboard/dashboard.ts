@@ -5,8 +5,8 @@ import { MatAnchor, MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
 import { ChoreControllerService, ChoreDto } from '../../../client';
 import { MatDialog } from '@angular/material/dialog';
-import { AddChoreDialog } from './add-chore-dialog';
 import { HouseholdService } from '../../service/household-service';
+import { CreateChoreDialog } from '../../components/create-chore-dialog/create-chore-dialog';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,7 +27,7 @@ export default class Dashboard {
   }
 
   openAddChoreDialog() {
-    const dialogRef = this.dialog.open(AddChoreDialog, {
+    const dialogRef = this.dialog.open(CreateChoreDialog, {
       width: '400px'
     });
 

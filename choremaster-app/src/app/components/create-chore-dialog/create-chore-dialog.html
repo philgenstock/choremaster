@@ -1,0 +1,13 @@
+<h2 mat-dialog-title>Create New Chore</h2>
+<mat-dialog-content>
+  <mat-form-field>
+    <mat-label>Chore Name</mat-label>
+    <input matInput [(ngModel)]="choreName" placeholder="Enter chore name" (keyup.enter)="onConfirm()" autofocus />
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onConfirm()" [disabled]="!choreName.trim()">
+    Create
+  </button>
+</mat-dialog-actions>
