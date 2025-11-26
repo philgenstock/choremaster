@@ -4,6 +4,7 @@ api.base.service.ts
 api.module.ts
 api/api.ts
 api/choreController.service.ts
+api/choreExecutionController.service.ts
 api/householdController.service.ts
 api/userController.service.ts
 configuration.ts
@@ -11,6 +12,7 @@ encoder.ts
 git_push.sh
 index.ts
 model/choreDto.ts
+model/choreExecutionDto.ts
 model/createChoreRequest.ts
 model/createHouseholdRequest.ts
 model/householdDto.ts
