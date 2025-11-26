@@ -2,9 +2,7 @@ package de.philgenstock.choremaster.household;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,5 +16,10 @@ public class HouseholdController {
     @GetMapping(value = "households", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<HouseholdDto> getAllHouseholdForCurrentUser() {
         return householdApplicationService.getHouseholdsForCurrentUser();
+    }
+
+    @PostMapping(value = "create", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public HouseholdDto createHousehold(@RequestBody CreateHouseholdRequest request) {
+        return householdApplicationService.createHouseholdForCurrentUser(request);
     }
 }

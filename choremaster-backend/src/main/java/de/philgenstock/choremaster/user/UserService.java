@@ -2,6 +2,8 @@ package de.philgenstock.choremaster.user;
 
 import de.philgenstock.choremaster.security.TokenService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -21,5 +23,12 @@ public class UserService {
                     userRepository.save(user);
                     return user;
                 });
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
     }
 }

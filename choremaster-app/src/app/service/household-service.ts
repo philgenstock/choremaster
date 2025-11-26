@@ -1,5 +1,6 @@
 import { inject, Injectable, signal, Signal } from '@angular/core';
 import { HouseholdControllerService, HouseholdDto } from '../../client';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +21,9 @@ export class HouseholdService {
     this.households.set([])
   }
 
+  createHousehold(name: string): Observable<HouseholdDto> {
+    return this.householdControllerService.createHousehold({ name });
+  }
 
-  
+
 }

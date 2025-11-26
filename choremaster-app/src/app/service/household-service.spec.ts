@@ -17,7 +17,7 @@ describe('HouseholdService', () => {
   beforeEach(() => {
     householdControllerServiceSpy = jasmine.createSpyObj<HouseholdControllerService>(
       'HouseholdControllerService',
-      ['getAllHouseholdForCurrentUser']
+      ['getAllHouseholdForCurrentUser', 'createHousehold']
     );
     // Set up the default return value
     (householdControllerServiceSpy.getAllHouseholdForCurrentUser as jasmine.Spy).and.returnValue(
@@ -35,6 +35,7 @@ describe('HouseholdService', () => {
 
   afterEach(() => {
     householdControllerServiceSpy.getAllHouseholdForCurrentUser.calls.reset();
+    householdControllerServiceSpy.createHousehold.calls.reset();
   });
 
   it('should be created', () => {
@@ -71,7 +72,51 @@ describe('HouseholdService', () => {
       service.households.set(mockHouseholds)
       service.resetHouseholds();
       expect(service.households()).toEqual([]);
-  
+
+    });
+  });
+
+  describe('createHousehold', () => {
+    it('should call createHousehold from controller service with household name', () => {
+      const newHousehold: HouseholdDto = { id: 4, name: 'New Household' };
+      (householdControllerServiceSpy.createHousehold as jasmine.Spy).and.returnValue(
+        of(newHousehold)
+      );
+
+      const result$ = service.createHousehold('New Household');
+
+      expect(householdControllerServiceSpy.createHousehold).toHaveBeenCalledWith({ name: 'New Household' });
+
+      result$.subscribe(result => {
+        expect(result).toEqual(newHousehold);
+      });
+    });
+
+    it('should return an observable with the created household', (done) => {
+      const newHousehold: HouseholdDto = { id: 5, name: 'Test Household' };
+      (householdControllerServiceSpy.createHousehold as jasmine.Spy).and.returnValue(
+        of(newHousehold)
+      );
+
+      service.createHousehold('Test Household').subscribe(result => {
+        expect(result).toEqual(newHousehold);
+        done();
+      });
+    });
+
+    it('should propagate errors from the controller service', (done) => {
+      const error = new Error('Creation failed');
+      (householdControllerServiceSpy.createHousehold as jasmine.Spy).and.returnValue(
+        throwError(() => error)
+      );
+
+      service.createHousehold('Failed Household').subscribe({
+        next: () => fail('should not succeed'),
+        error: (err) => {
+          expect(err).toBe(error);
+          done();
+        }
+      });
     });
   });
 
