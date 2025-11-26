@@ -120,4 +120,17 @@ describe('HouseholdService', () => {
     });
   });
 
+  describe('selectedHouseholdId', () => {
+    it('should allow setting selectedHouseholdId', () => {
+      service.selectedHouseholdId.set(123);
+      expect(service.selectedHouseholdId()).toBe(123);
+    });
+
+    it('should allow resetting selectedHouseholdId to null', () => {
+      service.selectedHouseholdId.set(456);
+      service.selectedHouseholdId.set(null);
+      expect(service.selectedHouseholdId()).toBeNull();
+    });
+  });
+
 });

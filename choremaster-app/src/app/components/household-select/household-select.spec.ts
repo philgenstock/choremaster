@@ -20,6 +20,7 @@ describe('HouseholdSelect', () => {
       'createHousehold'
     ]);
     (mockHouseholdService as any).households = signal([]);
+    (mockHouseholdService as any).selectedHouseholdId = signal<number | null>(null);
 
     mockDialog = jasmine.createSpyObj('MatDialog', ['open']);
 
@@ -43,12 +44,12 @@ describe('HouseholdSelect', () => {
   });
 
   it('should initialize with null selected household', () => {
-    expect(component.selectedHouseholdId()).toBeNull();
+    expect(mockHouseholdService.selectedHouseholdId()).toBeNull();
   });
 
   it('should set selected household id when a household is selected', () => {
     component.onSelectionChange(123);
-    expect(component.selectedHouseholdId()).toBe(123);
+    expect(mockHouseholdService.selectedHouseholdId()).toBe(123);
   });
 
   it('should open create dialog when "create" option is selected', () => {
@@ -77,7 +78,7 @@ describe('HouseholdSelect', () => {
     expect(mockDialogRef.afterClosed).toHaveBeenCalled();
     expect(mockHouseholdService.createHousehold).toHaveBeenCalledWith('New Household');
     expect(mockHouseholdService.loadHouseholds).toHaveBeenCalled();
-    expect(component.selectedHouseholdId()).toBe(456);
+    expect(mockHouseholdService.selectedHouseholdId()).toBe(456);
   });
 
   it('should not create household when dialog is cancelled', () => {
@@ -89,11 +90,11 @@ describe('HouseholdSelect', () => {
     component.openCreateDialog();
 
     expect(mockHouseholdService.createHousehold).not.toHaveBeenCalled();
-    expect(component.selectedHouseholdId()).toBeNull();
+    expect(mockHouseholdService.selectedHouseholdId()).toBeNull();
   });
 
   it('should reset selection to null when dialog is cancelled', () => {
-    component.selectedHouseholdId.set(123);
+    mockHouseholdService.selectedHouseholdId.set(123);
     const mockDialogRef = {
       afterClosed: jasmine.createSpy().and.returnValue(of(null))
     };
@@ -101,7 +102,7 @@ describe('HouseholdSelect', () => {
 
     component.openCreateDialog();
 
-    expect(component.selectedHouseholdId()).toBeNull();
+    expect(mockHouseholdService.selectedHouseholdId()).toBeNull();
   });
 
   it('should handle error when household creation fails', () => {
