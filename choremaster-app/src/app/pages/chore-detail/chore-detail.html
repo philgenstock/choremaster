@@ -1,0 +1,9 @@
+
+@if (choreExecutions()) {
+    @for (choreExecution of choreExecutions(); track choreExecution.id) {
+
+        <mat-card>
+            {{choreExecution.executorName}}
+        </mat-card>
+    }
+}

@@ -1,10 +1,10 @@
 
 @if (householdService.selectedHouseholdId()) {
     @for (chore of choreService.chores(); track chore.id) {
-        <mat-card appearance="outlined">
+        <mat-card appearance="outlined" (click)="navigateToChore(chore)" style="cursor: pointer;">
             <mat-card-title>{{chore.name}}</mat-card-title>
             <mat-card-actions>
-                <button matButton (click)="deleteChore(chore)"><mat-icon>delete_forever</mat-icon></button>
+                <button matButton (click)="deleteChore(chore); $event.stopPropagation()"><mat-icon>delete_forever</mat-icon></button>
             </mat-card-actions>
         </mat-card>
     }

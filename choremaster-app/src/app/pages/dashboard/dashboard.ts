@@ -7,6 +7,7 @@ import { ChoreControllerService, ChoreDto } from '../../../client';
 import { MatDialog } from '@angular/material/dialog';
 import { HouseholdService } from '../../service/household-service';
 import { CreateChoreDialog } from '../../components/create-chore-dialog/create-chore-dialog';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,9 +22,14 @@ export default class Dashboard {
   choreControllerService = inject(ChoreControllerService)
   householdService = inject(HouseholdService)
   dialog = inject(MatDialog)
+  router = inject(Router)
 
   deleteChore(chore: ChoreDto) {
     this.choreControllerService.deleteChore(chore.id!!).subscribe(() => this.choreService.loadChores())
+  }
+
+  navigateToChore(chore: ChoreDto) {
+    this.router.navigate(['/chores', chore.id]);
   }
 
   openAddChoreDialog() {
