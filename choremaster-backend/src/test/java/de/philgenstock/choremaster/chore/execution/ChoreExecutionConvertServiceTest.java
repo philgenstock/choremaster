@@ -10,8 +10,7 @@ import java.time.LocalDateTime;
 import static de.philgenstock.choremaster.chore.ChoreBuilder.aChore;
 import static de.philgenstock.choremaster.chore.execution.ChoreExecutionBuilder.aChoreExecution;
 import static de.philgenstock.choremaster.user.UserBuilder.aUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ChoreExecutionConvertServiceTest {
 
@@ -47,10 +46,9 @@ class ChoreExecutionConvertServiceTest {
         ChoreExecutionDto result = choreExecutionConvertService.toDto(choreExecution);
 
         // Then
-        assertNotNull(result);
-        assertEquals(10L, result.id());
-        assertEquals("John Doe", result.executorName());
-        assertEquals(executedAt, result.executedAt());
+        assertThat(result)
+                .extracting(ChoreExecutionDto::id, ChoreExecutionDto::executorName, ChoreExecutionDto::executedAt)
+                .containsExactly(10L, "John Doe", executedAt);
     }
 
     @Test
@@ -68,6 +66,6 @@ class ChoreExecutionConvertServiceTest {
         ChoreExecutionDto result = choreExecutionConvertService.toDto(choreExecution);
 
         // Then
-        assertEquals("Jane Smith", result.executorName());
+        assertThat(result.executorName()).isEqualTo("Jane Smith");
     }
 }

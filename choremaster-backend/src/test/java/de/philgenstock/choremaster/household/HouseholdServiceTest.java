@@ -14,7 +14,7 @@ import java.util.Set;
 
 import static de.philgenstock.choremaster.household.HouseholdBuilder.aHousehold;
 import static de.philgenstock.choremaster.user.UserBuilder.aUser;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -43,12 +43,8 @@ class HouseholdServiceTest {
         List<Household> result = householdService.getHouseholdsForUser(user);
 
         // Then
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertTrue(result.containsAll(households));
-        assertTrue(result.contains(household2));
-
-        assertNotSame(user.getHouseholds(), result);
+        assertThat(result)
+                .containsExactlyInAnyOrder(household1, household2);
     }
 
     @Test
@@ -69,14 +65,16 @@ class HouseholdServiceTest {
         Household result = householdService.createHousehold(householdName, owner);
 
         // Then
-        assertEquals(householdName, result.getName());
-        assertEquals(owner, result.getOwner());
+        assertThat(result)
+                .extracting(Household::getName, Household::getOwner)
+                .containsExactly(householdName, owner);
 
         ArgumentCaptor<Household> householdCaptor = ArgumentCaptor.forClass(Household.class);
         verify(householdRepository, times(1)).save(householdCaptor.capture());
 
         Household capturedHousehold = householdCaptor.getValue();
-        assertEquals(householdName, capturedHousehold.getName());
-        assertEquals(owner, capturedHousehold.getOwner());
+        assertThat(capturedHousehold)
+                .extracting(Household::getName, Household::getOwner)
+                .containsExactly(householdName, owner);
     }
 }

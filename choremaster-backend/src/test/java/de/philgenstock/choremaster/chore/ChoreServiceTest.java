@@ -12,7 +12,7 @@ import java.util.List;
 
 import static de.philgenstock.choremaster.chore.ChoreBuilder.aChore;
 import static de.philgenstock.choremaster.household.HouseholdBuilder.aHousehold;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,10 +44,8 @@ class ChoreServiceTest {
         List<Chore> result = choreService.getChoresByHousehold(household);
 
         // Then
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertTrue(result.contains(chore1));
-        assertTrue(result.contains(chore2));
+        assertThat(result)
+                .containsExactlyInAnyOrder(chore1, chore2);
         verify(choreRepository, times(1)).findByHousehold(household);
     }
 
@@ -61,8 +59,8 @@ class ChoreServiceTest {
         List<Chore> result = choreService.getChoresByHousehold(household);
 
         // Then
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertThat(result)
+                .isEmpty();
     }
 
     @Test
@@ -82,15 +80,17 @@ class ChoreServiceTest {
         Chore result = choreService.createChore(choreName, household);
 
         // Then
-        assertEquals(choreName, result.getName());
-        assertEquals(household, result.getHousehold());
+        assertThat(result)
+                .extracting(Chore::getName, Chore::getHousehold)
+                .containsExactly(choreName, household);
 
         ArgumentCaptor<Chore> choreCaptor = ArgumentCaptor.forClass(Chore.class);
         verify(choreRepository, times(1)).save(choreCaptor.capture());
 
         Chore capturedChore = choreCaptor.getValue();
-        assertEquals(choreName, capturedChore.getName());
-        assertEquals(household, capturedChore.getHousehold());
+        assertThat(capturedChore)
+                .extracting(Chore::getName, Chore::getHousehold)
+                .containsExactly(choreName, household);
     }
 
     @Test
