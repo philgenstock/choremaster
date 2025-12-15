@@ -13,7 +13,19 @@
     @for (choreExecution of choreExecutions(); track choreExecution.id) {
 
         <mat-card>
-            {{choreExecution.executorName}}
+            <div>
+                <span>
+      {{choreExecution.executorName}}
+                </span>
+                <span>
+                    {{choreExecution.executedAt | date:'dd.MM.yyyy HH:mm'}}
+                </span>
+      
+            </div>
         </mat-card>
     }
 }
+
+<button mat-fab class="fab-button" (click)="executeChore()">
+    <mat-icon>add</mat-icon>
+</button>

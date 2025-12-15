@@ -141,7 +141,14 @@ describe('HouseholdService', () => {
       // Arrange: Set up localStorage before service creation
       localStorage.setItem('SELECTED_HOUSEHOLD', '42');
 
-      // Re-inject service to trigger constructor
+      // Re-create TestBed and service to trigger constructor
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
       const newService = TestBed.inject(HouseholdService);
 
       // Assert
@@ -151,31 +158,47 @@ describe('HouseholdService', () => {
     it('should initialize selectedHouseholdId as null when localStorage is empty', () => {
       // localStorage is already cleared in beforeEach
 
-      // Re-inject service to trigger constructor
+      // Re-create TestBed and service to trigger constructor
+      TestBed.resetTestingModule();
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
       const newService = TestBed.inject(HouseholdService);
 
       // Assert
       expect(newService.selectedHouseholdId()).toBeNull();
     });
 
-    it('should save selectedHouseholdId to localStorage when value changes', () => {
+    it('should save selectedHouseholdId to localStorage when value changes', (done) => {
       // Act
       service.selectedHouseholdId.set(123);
 
-      // Assert
-      expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('123');
+      // Assert - need to wait for async observable to fire
+      setTimeout(() => {
+        expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('123');
+        done();
+      }, 0);
     });
 
-    it('should update localStorage when selectedHouseholdId changes to null', () => {
+    it('should update localStorage when selectedHouseholdId changes to null', (done) => {
       // Arrange
       service.selectedHouseholdId.set(456);
-      expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('456');
 
-      // Act
-      service.selectedHouseholdId.set(null);
+      setTimeout(() => {
+        expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('456');
 
-      // Assert
-      expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('null');
+        // Act
+        service.selectedHouseholdId.set(null);
+
+        setTimeout(() => {
+          // Assert
+          expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('null');
+          done();
+        }, 0);
+      }, 0);
     });
   });
 

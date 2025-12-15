@@ -1,8 +1,6 @@
 package de.philgenstock.choremaster.chore.execution;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,13 +12,12 @@ public class ChoreExecutionController {
 
     private final ChoreExecutionApplicationService choreExecutionApplicationService;
 
-    @GetMapping(value = "{choreId}/executions", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "{choreId}/executions")
     public List<ChoreExecutionDto> getExecutionsByChore(@PathVariable Long choreId) {
         return choreExecutionApplicationService.getExecutionsByChoreId(choreId);
     }
 
-    @PostMapping(value = "{choreId}/execute", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(value = "{choreId}/execute")
     public ChoreExecutionDto executeChore(@PathVariable Long choreId) {
         return choreExecutionApplicationService.executeChore(choreId);
     }
