@@ -1,4 +1,14 @@
 
+<mat-card appearance="outlined">
+    <mat-card-title>
+        @if (chore()) {
+            {{chore()?.name}}   
+        }
+    </mat-card-title>
+
+</mat-card>
+
+
 @if (choreExecutions()) {
     @for (choreExecution of choreExecutions(); track choreExecution.id) {
 
