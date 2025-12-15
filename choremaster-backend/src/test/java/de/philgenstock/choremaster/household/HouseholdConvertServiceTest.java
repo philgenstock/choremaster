@@ -4,11 +4,9 @@ import de.philgenstock.choremaster.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDateTime;
-
 import static de.philgenstock.choremaster.household.HouseholdBuilder.aHousehold;
 import static de.philgenstock.choremaster.user.UserBuilder.aUser;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class HouseholdConvertServiceTest {
 
@@ -30,9 +28,9 @@ class HouseholdConvertServiceTest {
         HouseholdDto result = householdConvertService.toDto(household);
 
         // Then
-        assertNotNull(result);
-        assertEquals(1L, result.id());
-        assertEquals("Doe Family", result.name());
+        assertThat(result)
+                .extracting(HouseholdDto::id, HouseholdDto::name)
+                .containsExactly(1L, "Doe Family");
     }
 
     @Test
@@ -45,9 +43,9 @@ class HouseholdConvertServiceTest {
         Household result = householdConvertService.toNewHousehold(householdDto, owner);
 
         // Then
-        assertNotNull(result);
-        assertEquals("Johnson Family", result.getName());
-        assertEquals(owner, result.getOwner());
+        assertThat(result)
+                .extracting(Household::getName, Household::getOwner)
+                .containsExactly("Johnson Family", owner);
     }
 
 }

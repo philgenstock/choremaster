@@ -6,8 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static de.philgenstock.choremaster.chore.ChoreBuilder.aChore;
 import static de.philgenstock.choremaster.household.HouseholdBuilder.aHousehold;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ChoreConvertServiceTest {
 
@@ -31,9 +30,9 @@ class ChoreConvertServiceTest {
         ChoreDto result = choreConvertService.toDto(chore);
 
         // Then
-        assertNotNull(result);
-        assertEquals(1L, result.id());
-        assertEquals("Clean the kitchen", result.name());
+        assertThat(result)
+                .extracting(ChoreDto::id, ChoreDto::name)
+                .containsExactly(1L, "Clean the kitchen");
     }
 
     @Test
@@ -46,8 +45,8 @@ class ChoreConvertServiceTest {
         Chore result = choreConvertService.toNewChore(choreDto, household);
 
         // Then
-        assertNotNull(result);
-        assertEquals("Do the laundry", result.getName());
-        assertEquals(household, result.getHousehold());
+        assertThat(result)
+                .extracting(Chore::getName, Chore::getHousehold)
+                .containsExactly("Do the laundry", household);
     }
 }

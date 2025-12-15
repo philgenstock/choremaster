@@ -4,8 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static de.philgenstock.choremaster.user.UserBuilder.aUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class UserConvertServiceTest {
 
@@ -28,9 +27,9 @@ class UserConvertServiceTest {
         UserDto result = userConvertService.toDto(user);
 
         // Then
-        assertNotNull(result);
-        assertEquals("John Doe", result.name());
-        assertEquals("john.doe@example.com", result.email());
+        assertThat(result)
+                .extracting(UserDto::name, UserDto::email)
+                .containsExactly("John Doe", "john.doe@example.com");
     }
 
 
@@ -43,8 +42,8 @@ class UserConvertServiceTest {
         User result = userConvertService.toNewUser(userDto);
 
         // Then
-        assertNotNull(result);
-        assertEquals("Alice Smith", result.getName());
-        assertEquals("alice.smith@example.com", result.getEmail());
+        assertThat(result)
+                .extracting(User::getName, User::getEmail)
+                .containsExactly("Alice Smith", "alice.smith@example.com");
     }
 }

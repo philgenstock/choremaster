@@ -13,7 +13,8 @@ import java.util.Optional;
 
 import static de.philgenstock.choremaster.chore.ChoreBuilder.aChore;
 import static de.philgenstock.choremaster.household.HouseholdBuilder.aHousehold;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,10 +59,8 @@ class ChoreApplicationServiceTest {
         List<ChoreDto> result = choreApplicationService.getChoresByHouseholdId(householdId);
 
         // Then
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals(choreDto1, result.get(0));
-        assertEquals(choreDto2, result.get(1));
+        assertThat(result)
+                .containsExactlyInAnyOrder(choreDto1, choreDto2);
         verify(householdRepository, times(1)).findById(householdId);
         verify(choreService, times(1)).getChoresByHousehold(household);
     }
@@ -78,8 +77,8 @@ class ChoreApplicationServiceTest {
         List<ChoreDto> result = choreApplicationService.getChoresByHouseholdId(householdId);
 
         // Then
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
+        assertThat(result)
+                .isEmpty();
         verify(householdRepository, times(1)).findById(householdId);
         verify(choreService, times(1)).getChoresByHousehold(household);
     }
@@ -91,7 +90,8 @@ class ChoreApplicationServiceTest {
         when(householdRepository.findById(householdId)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> choreApplicationService.getChoresByHouseholdId(householdId));
+        assertThatThrownBy(() -> choreApplicationService.getChoresByHouseholdId(householdId))
+                .isInstanceOf(IllegalArgumentException.class);
         verify(householdRepository, times(1)).findById(householdId);
         verify(choreService, never()).getChoresByHousehold(any());
     }
@@ -115,8 +115,8 @@ class ChoreApplicationServiceTest {
         ChoreDto result = choreApplicationService.createChore(request);
 
         // Then
-        assertNotNull(result);
-        assertEquals(choreDto, result);
+        assertThat(result)
+                .isEqualTo(choreDto);
         verify(householdRepository, times(1)).findById(10L);
         verify(choreService, times(1)).createChore("Vacuum the living room", household);
         verify(choreConvertService, times(1)).toDto(chore);
@@ -129,7 +129,8 @@ class ChoreApplicationServiceTest {
         when(householdRepository.findById(10L)).thenReturn(Optional.empty());
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () -> choreApplicationService.createChore(request));
+        assertThatThrownBy(() -> choreApplicationService.createChore(request))
+                .isInstanceOf(IllegalArgumentException.class);
         verify(householdRepository, times(1)).findById(10L);
         verify(choreService, never()).createChore(anyString(), any());
     }

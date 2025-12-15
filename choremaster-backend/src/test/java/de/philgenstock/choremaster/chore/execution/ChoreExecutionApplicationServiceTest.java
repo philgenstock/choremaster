@@ -18,7 +18,7 @@ import static de.philgenstock.choremaster.chore.ChoreBuilder.aChore;
 import static de.philgenstock.choremaster.chore.execution.ChoreExecutionBuilder.aChoreExecution;
 import static de.philgenstock.choremaster.household.HouseholdBuilder.aHousehold;
 import static de.philgenstock.choremaster.user.UserBuilder.aUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -61,8 +61,8 @@ class ChoreExecutionApplicationServiceTest {
         List<ChoreExecutionDto> result = choreExecutionApplicationService.getExecutionsByChoreId(choreId);
 
         // Then
-        assertEquals(1, result.size());
-        assertEquals(dto1, result.getFirst());
+        assertThat(result)
+                .containsExactlyInAnyOrder(dto1);
     }
 
     @Test
@@ -88,7 +88,7 @@ class ChoreExecutionApplicationServiceTest {
         ChoreExecutionDto result = choreExecutionApplicationService.executeChore(choreId);
 
         // Then
-        assertEquals(dto, result);
+        assertThat(result).isEqualTo(dto);
         verify(choreExecutionService, times(1)).executeChore(chore, executor);
     }
 }

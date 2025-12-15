@@ -14,7 +14,7 @@ import java.util.List;
 import static de.philgenstock.choremaster.chore.ChoreBuilder.aChore;
 import static de.philgenstock.choremaster.chore.execution.ChoreExecutionBuilder.aChoreExecution;
 import static de.philgenstock.choremaster.user.UserBuilder.aUser;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,8 +42,8 @@ class ChoreExecutionServiceTest {
         List<ChoreExecution> result = choreExecutionService.getExecutionsByChore(chore);
 
         // Then
-        assertEquals(1, result.size());
-        assertEquals(execution1, result.getFirst());
+        assertThat(result)
+                .containsExactlyInAnyOrder(execution1);
     }
 
     @Test
@@ -64,15 +64,16 @@ class ChoreExecutionServiceTest {
         ChoreExecution result = choreExecutionService.executeChore(chore, executor);
 
         // Then
-        assertEquals(5L, result.getId());
-        assertEquals(chore, result.getChore());
-        assertEquals(executor, result.getExecutor());
+        assertThat(result)
+                .extracting(ChoreExecution::getId, ChoreExecution::getChore, ChoreExecution::getExecutor)
+                .containsExactly(5L, chore, executor);
 
         ArgumentCaptor<ChoreExecution> executionCaptor = ArgumentCaptor.forClass(ChoreExecution.class);
         verify(choreExecutionRepository, times(1)).save(executionCaptor.capture());
 
         ChoreExecution capturedExecution = executionCaptor.getValue();
-        assertEquals(chore, capturedExecution.getChore());
-        assertEquals(executor, capturedExecution.getExecutor());
+        assertThat(capturedExecution)
+                .extracting(ChoreExecution::getChore, ChoreExecution::getExecutor)
+                .containsExactly(chore, executor);
     }
 }
