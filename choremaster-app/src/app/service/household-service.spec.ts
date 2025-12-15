@@ -15,6 +15,8 @@ describe('HouseholdService', () => {
   ];
 
   beforeEach(() => {
+    localStorage.clear();
+
     householdControllerServiceSpy = jasmine.createSpyObj<HouseholdControllerService>(
       'HouseholdControllerService',
       ['getAllHouseholdForCurrentUser', 'createHousehold']
@@ -36,6 +38,7 @@ describe('HouseholdService', () => {
   afterEach(() => {
     householdControllerServiceSpy.getAllHouseholdForCurrentUser.calls.reset();
     householdControllerServiceSpy.createHousehold.calls.reset();
+    localStorage.clear();
   });
 
   it('should be created', () => {
@@ -130,6 +133,49 @@ describe('HouseholdService', () => {
       service.selectedHouseholdId.set(456);
       service.selectedHouseholdId.set(null);
       expect(service.selectedHouseholdId()).toBeNull();
+    });
+  });
+
+  describe('constructor localStorage integration', () => {
+    it('should initialize selectedHouseholdId from localStorage when value exists', () => {
+      // Arrange: Set up localStorage before service creation
+      localStorage.setItem('SELECTED_HOUSEHOLD', '42');
+
+      // Re-inject service to trigger constructor
+      const newService = TestBed.inject(HouseholdService);
+
+      // Assert
+      expect(newService.selectedHouseholdId()).toBe(42);
+    });
+
+    it('should initialize selectedHouseholdId as null when localStorage is empty', () => {
+      // localStorage is already cleared in beforeEach
+
+      // Re-inject service to trigger constructor
+      const newService = TestBed.inject(HouseholdService);
+
+      // Assert
+      expect(newService.selectedHouseholdId()).toBeNull();
+    });
+
+    it('should save selectedHouseholdId to localStorage when value changes', () => {
+      // Act
+      service.selectedHouseholdId.set(123);
+
+      // Assert
+      expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('123');
+    });
+
+    it('should update localStorage when selectedHouseholdId changes to null', () => {
+      // Arrange
+      service.selectedHouseholdId.set(456);
+      expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('456');
+
+      // Act
+      service.selectedHouseholdId.set(null);
+
+      // Assert
+      expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('null');
     });
   });
 
