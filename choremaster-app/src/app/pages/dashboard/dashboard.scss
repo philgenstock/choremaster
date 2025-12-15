@@ -1,0 +1,55 @@
+.dashboard-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h1 {
+    margin-bottom: 32px;
+    color: #333;
+  }
+}
+
+.household-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.household-card {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  mat-card-content {
+    text-align: center;
+    padding: 32px 16px;
+
+    .household-icon {
+      mat-icon {
+        font-size: 64px;
+        width: 64px;
+        height: 64px;
+        color: var(--mat-sys-primary);
+        margin-bottom: 16px;
+      }
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 500;
+      color: #333;
+    }
+  }
+}
+
+.add-household-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
