@@ -1,18 +1,4 @@
 <mat-toolbar class="header-toolbar" color="primary">
-  <span class="app-title">Choremaster</span>
+  <span class="app-title" [routerLink]="['/']">Choremaster</span>
   <span class="spacer"></span>
-  @if(authorizationInfoService.authorizationInfo(); as authorizationInfo) {
-      <div class="user-section">
-        <app-household-select class="household-select"></app-household-select>
-        <div class="user-info">
-          <span class="user-name">{{authorizationInfo.name}}</span>
-        </div>
-        <button mat-icon-button class="logout-button" (click)="logout()" aria-label="Logout">
-          <mat-icon>logout</mat-icon>
-        </button>
-      </div>
-  }
-  @else {
-      <asl-google-signin-button class="signin-button"></asl-google-signin-button>
-  }
 </mat-toolbar>

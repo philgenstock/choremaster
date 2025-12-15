@@ -2,6 +2,7 @@ import { GoogleLoginProvider, SOCIAL_AUTH_CONFIG, SocialAuthServiceConfig } from
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 
 const mockSocialAuthServiceConfig: SocialAuthServiceConfig = {
@@ -23,6 +24,7 @@ export const defaultTestProviders= [
      provideZonelessChangeDetection(),
      provideHttpClient(),
      provideHttpClientTesting(),
+     provideRouter([])
 ]
 
 export const defaultTestProvidersWithAuth = [

@@ -1,17 +1,21 @@
-
-@if (householdService.selectedHouseholdId()) {
-    @for (chore of choreService.chores(); track chore.id) {
-        <mat-card appearance="outlined" (click)="navigateToChore(chore)" style="cursor: pointer;">
-            <mat-card-title>{{chore.name}}</mat-card-title>
-            <mat-card-actions>
-                <button matButton (click)="deleteChore(chore); $event.stopPropagation()"><mat-icon>delete_forever</mat-icon></button>
-            </mat-card-actions>
-        </mat-card>
-    }
-    <div style="margin-bottom: 20px;">
-        <button mat-raised-button color="primary" (click)="openAddChoreDialog()">
-            <mat-icon>add</mat-icon>
-                Add Chore
-         </button>
+<div class="dashboard-container">
+    <div class="household-grid">
+        @for (household of householdService.households(); track household.id) {
+            <mat-card appearance="outlined" (click)="navigateToHousehold(household)" class="household-card">
+                <mat-card-content>
+                    <div class="household-icon">
+                        <mat-icon>home</mat-icon>
+                    </div>
+                    <h2>{{household.name}}</h2>
+                </mat-card-content>
+            </mat-card>
+        }
     </div>
-}
+
+    <div class="add-household-button">
+        <button mat-raised-button color="primary" (click)="openAddHouseholdDialog()">
+            <mat-icon>add</mat-icon>
+            Add Household
+        </button>
+    </div>
+</div>

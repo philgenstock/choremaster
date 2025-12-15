@@ -1,11 +1,9 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ChoreControllerService, ChoreDto, ChoreExecutionControllerService, ChoreExecutionDto } from '../../../client';
-import { T } from '@angular/cdk/keycodes';
 import { MatCard, MatCardTitle } from "@angular/material/card";
 import { MatFabButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
-import { ChoreService } from '../../service/chore-service';
 import { DatePipe } from '@angular/common';
 
 @Component({
@@ -23,7 +21,8 @@ export class ChoreDetail implements OnInit {
   choreId: number | null = null
 
   choreExecutionControllerService = inject(ChoreExecutionControllerService)
-  choreService = inject(ChoreService)
+  choreControllerService = inject(ChoreControllerService)
+
   ngOnInit(): void {
     const choreId = this.route.snapshot.paramMap.get('choreId');
     if(choreId) {
@@ -31,9 +30,9 @@ export class ChoreDetail implements OnInit {
       this.choreExecutionControllerService.getExecutionsByChore(this.choreId)
         .subscribe(executions => this.choreExecutions.set(executions))
 
-      this.choreService.getChore(this.choreId)
+      this.choreControllerService.getChoreById(this.choreId)
         .subscribe(chore => this.chore.set(chore))
-      
+
     }
   }
 

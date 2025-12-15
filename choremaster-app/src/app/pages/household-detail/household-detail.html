@@ -1,0 +1,21 @@
+<div class="household-detail-container">
+    <h1>Chores</h1>
+
+    @for (chore of chores(); track chore.id) {
+        <mat-card appearance="outlined" (click)="navigateToChore(chore)" class="chore-card">
+            <mat-card-title>{{chore.name}}</mat-card-title>
+            <mat-card-actions>
+                <button matButton (click)="deleteChore(chore); $event.stopPropagation()">
+                    <mat-icon>delete_forever</mat-icon>
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    }
+
+    <div class="add-chore-button">
+        <button mat-raised-button color="primary" (click)="openAddChoreDialog()">
+            <mat-icon>add</mat-icon>
+            Add Chore
+        </button>
+    </div>
+</div>

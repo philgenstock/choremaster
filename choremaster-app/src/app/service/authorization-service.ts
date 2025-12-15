@@ -1,4 +1,5 @@
 import { inject, Injectable, Signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthorizationInfo } from '../../model/authorization-info';
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { UserControllerService } from '../../client';
@@ -14,6 +15,7 @@ export class AuthorizationService {
   private socialAuthService = inject(SocialAuthService)
   private userControllerService = inject(UserControllerService)
   private householdService = inject(HouseholdService)
+  private router = inject(Router)
   
   constructor() {
     const localStorageAuthorization = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -43,6 +45,11 @@ export class AuthorizationService {
       this.authorizationInfoService.authorizationInfo.set(authorizationInfo)
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(authorizationInfo))
       this.householdService.loadHouseholds()
+
+      // Navigate to the return URL or dashboard after successful login
+      const urlTree = this.router.parseUrl(this.router.url);
+      const returnUrl = urlTree.queryParams['returnUrl'] || '/';
+      this.router.navigateByUrl(returnUrl)
     })
   }
 

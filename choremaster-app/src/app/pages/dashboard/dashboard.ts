@@ -1,57 +1,45 @@
 import { Component, inject } from '@angular/core';
-import { ChoreService } from '../../service/chore-service';
-import { MatCard, MatCardTitle, MatCardActions } from '@angular/material/card';
-import { MatAnchor, MatButton } from "@angular/material/button";
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatButton } from "@angular/material/button";
 import { MatIcon } from "@angular/material/icon";
-import { ChoreControllerService, ChoreDto } from '../../../client';
+import { HouseholdDto } from '../../../client';
 import { MatDialog } from '@angular/material/dialog';
 import { HouseholdService } from '../../service/household-service';
-import { CreateChoreDialog } from '../../components/create-chore-dialog/create-chore-dialog';
+import { CreateHouseholdDialog } from '../../components/create-household-dialog/create-household-dialog';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [MatCard, MatCardTitle, MatCardActions, MatAnchor, MatButton, MatIcon],
+  imports: [MatCard, MatCardContent, MatButton, MatIcon],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
   standalone: true
 })
 export default class Dashboard {
 
-  choreService = inject(ChoreService)
-  choreControllerService = inject(ChoreControllerService)
   householdService = inject(HouseholdService)
   dialog = inject(MatDialog)
   router = inject(Router)
 
-  deleteChore(chore: ChoreDto) {
-    this.choreControllerService.deleteChore(chore.id!!).subscribe(() => this.choreService.loadChores())
+  navigateToHousehold(household: HouseholdDto) {
+    this.router.navigate(['/household', household.id]);
   }
 
-  navigateToChore(chore: ChoreDto) {
-    this.router.navigate(['/chores', chore.id]);
-  }
-
-  openAddChoreDialog() {
-    const dialogRef = this.dialog.open(CreateChoreDialog, {
+  openAddHouseholdDialog() {
+    const dialogRef = this.dialog.open(CreateHouseholdDialog, {
       width: '400px'
     });
 
-    dialogRef.afterClosed().subscribe(choreName => {
-      if (choreName) {
-        this.addChore(choreName);
+    dialogRef.afterClosed().subscribe(householdName => {
+      if (householdName) {
+        this.addHousehold(householdName);
       }
     });
   }
 
-  private addChore(choreName: string) {
-    const householdId = this.householdService.selectedHouseholdId();
-    if (!householdId) {
-      return;
-    }
-
-    this.choreControllerService.createChore({ name: choreName, householdId })
-      .subscribe(() => this.choreService.loadChores());
+  private addHousehold(householdName: string) {
+    this.householdService.createHousehold(householdName)
+      .subscribe(() => this.householdService.loadHouseholds());
   }
 
 }

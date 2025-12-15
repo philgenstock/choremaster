@@ -35,4 +35,8 @@ public class ChoreApplicationService {
     public void deleteChore(Long choreId) {
         choreService.deleteChore(choreId);
     }
+
+    public ChoreDto getChoreById(Long choreId) {
+        return choreConvertService.toDto(choreService.getChoreById(choreId));
+    }
 }

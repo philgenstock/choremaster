@@ -1,0 +1,35 @@
+.household-detail-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+
+  h1 {
+    margin-bottom: 24px;
+    color: #333;
+  }
+}
+
+.chore-card {
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  mat-card-title {
+    font-size: 18px;
+  }
+
+  mat-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 16px;
+  }
+}
+
+.add-chore-button {
+  margin-top: 24px;
+}
