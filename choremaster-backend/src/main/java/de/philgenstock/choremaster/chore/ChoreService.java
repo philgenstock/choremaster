@@ -21,6 +21,11 @@ public class ChoreService {
         return choreRepository.save(chore);
     }
 
+    public Chore getChoreById(Long choreId) {
+        return choreRepository.findById(choreId)
+                .orElseThrow(() -> new IllegalArgumentException("Chore not found with id: " + choreId));
+    }
+
     public void deleteChore(Long choreId) {
         choreRepository.deleteById(choreId);
     }
