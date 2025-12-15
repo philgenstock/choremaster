@@ -1,12 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { HouseholdService } from './household-service';
 import { HouseholdControllerService, HouseholdDto } from '../../client';
-import { of, throwError, Observable } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { defaultTestProviders } from '../../test-utils';
 
 describe('HouseholdService', () => {
   let service: HouseholdService;
   let householdControllerServiceSpy: jasmine.SpyObj<HouseholdControllerService>;
+  let localStorageSpy: jasmine.SpyObj<Storage>;
 
   const mockHouseholds: HouseholdDto[] = [
     { id: 1, name: 'Household 1' },
@@ -15,7 +16,11 @@ describe('HouseholdService', () => {
   ];
 
   beforeEach(() => {
-    localStorage.clear();
+    localStorageSpy = jasmine.createSpyObj('localStorage', ['getItem', 'setItem', 'removeItem']);
+    Object.defineProperty(window, 'localStorage', {
+      value: localStorageSpy,
+      writable: true
+    });
 
     householdControllerServiceSpy = jasmine.createSpyObj<HouseholdControllerService>(
       'HouseholdControllerService',
@@ -25,7 +30,18 @@ describe('HouseholdService', () => {
     (householdControllerServiceSpy.getAllHouseholdForCurrentUser as jasmine.Spy).and.returnValue(
       of([])
     );
+  });
 
+  afterEach(() => {
+    localStorageSpy.getItem.calls.reset();
+    localStorageSpy.setItem.calls.reset();
+    localStorageSpy.removeItem.calls.reset();
+    householdControllerServiceSpy.getAllHouseholdForCurrentUser.calls.reset();
+    householdControllerServiceSpy.createHousehold.calls.reset();
+  });
+
+  it('should be created', () => {
+    localStorageSpy.getItem.and.returnValue(null);
     TestBed.configureTestingModule({
       providers: [
         ...defaultTestProviders,
@@ -33,25 +49,38 @@ describe('HouseholdService', () => {
       ]
     });
     service = TestBed.inject(HouseholdService);
-  });
-
-  afterEach(() => {
-    householdControllerServiceSpy.getAllHouseholdForCurrentUser.calls.reset();
-    householdControllerServiceSpy.createHousehold.calls.reset();
-    localStorage.clear();
-  });
-
-  it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
   describe('initial state', () => {
+    beforeEach(() => {
+      localStorageSpy.getItem.and.returnValue(null);
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
+      service = TestBed.inject(HouseholdService);
+    });
+
     it('should initialize with empty households array', () => {
       expect(service.households()).toEqual([]);
     });
   });
 
   describe('loadHouseholds', () => {
+    beforeEach(() => {
+      localStorageSpy.getItem.and.returnValue(null);
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
+      service = TestBed.inject(HouseholdService);
+    });
+
     it('should call getAllHouseholdForCurrentUser from controller service', () => {
       (householdControllerServiceSpy.getAllHouseholdForCurrentUser as jasmine.Spy).and.returnValue(
         of(mockHouseholds)
@@ -66,6 +95,17 @@ describe('HouseholdService', () => {
   });
 
   describe('resetHouseholds', () => {
+    beforeEach(() => {
+      localStorageSpy.getItem.and.returnValue(null);
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
+      service = TestBed.inject(HouseholdService);
+    });
+
     it('should set households to empty array', () => {
       (householdControllerServiceSpy.getAllHouseholdForCurrentUser as jasmine.Spy).and.returnValue(
         of(mockHouseholds)
@@ -80,6 +120,17 @@ describe('HouseholdService', () => {
   });
 
   describe('createHousehold', () => {
+    beforeEach(() => {
+      localStorageSpy.getItem.and.returnValue(null);
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
+      service = TestBed.inject(HouseholdService);
+    });
+
     it('should call createHousehold from controller service with household name', () => {
       const newHousehold: HouseholdDto = { id: 4, name: 'New Household' };
       (householdControllerServiceSpy.createHousehold as jasmine.Spy).and.returnValue(
@@ -124,6 +175,17 @@ describe('HouseholdService', () => {
   });
 
   describe('selectedHouseholdId', () => {
+    beforeEach(() => {
+      localStorageSpy.getItem.and.returnValue(null);
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
+      service = TestBed.inject(HouseholdService);
+    });
+
     it('should allow setting selectedHouseholdId', () => {
       service.selectedHouseholdId.set(123);
       expect(service.selectedHouseholdId()).toBe(123);
@@ -139,10 +201,9 @@ describe('HouseholdService', () => {
   describe('constructor localStorage integration', () => {
     it('should initialize selectedHouseholdId from localStorage when value exists', () => {
       // Arrange: Set up localStorage before service creation
-      localStorage.setItem('SELECTED_HOUSEHOLD', '42');
+      localStorageSpy.getItem.and.returnValue('42');
 
-      // Re-create TestBed and service to trigger constructor
-      TestBed.resetTestingModule();
+      // Create TestBed and service to trigger constructor
       TestBed.configureTestingModule({
         providers: [
           ...defaultTestProviders,
@@ -153,13 +214,14 @@ describe('HouseholdService', () => {
 
       // Assert
       expect(newService.selectedHouseholdId()).toBe(42);
+      expect(localStorageSpy.getItem).toHaveBeenCalledWith('SELECTED_HOUSEHOLD');
     });
 
     it('should initialize selectedHouseholdId as null when localStorage is empty', () => {
-      // localStorage is already cleared in beforeEach
+      // Arrange: Set up localStorage to return null
+      localStorageSpy.getItem.and.returnValue(null);
 
-      // Re-create TestBed and service to trigger constructor
-      TestBed.resetTestingModule();
+      // Create TestBed and service to trigger constructor
       TestBed.configureTestingModule({
         providers: [
           ...defaultTestProviders,
@@ -170,32 +232,52 @@ describe('HouseholdService', () => {
 
       // Assert
       expect(newService.selectedHouseholdId()).toBeNull();
+      expect(localStorageSpy.getItem).toHaveBeenCalledWith('SELECTED_HOUSEHOLD');
     });
 
     it('should save selectedHouseholdId to localStorage when value changes', (done) => {
+      // Arrange
+      localStorageSpy.getItem.and.returnValue(null);
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
+      service = TestBed.inject(HouseholdService);
+
       // Act
       service.selectedHouseholdId.set(123);
 
       // Assert - need to wait for async observable to fire
       setTimeout(() => {
-        expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('123');
+        expect(localStorageSpy.setItem).toHaveBeenCalledWith('SELECTED_HOUSEHOLD', '123');
         done();
       }, 0);
     });
 
     it('should update localStorage when selectedHouseholdId changes to null', (done) => {
       // Arrange
+      localStorageSpy.getItem.and.returnValue(null);
+      TestBed.configureTestingModule({
+        providers: [
+          ...defaultTestProviders,
+          { provide: HouseholdControllerService, useValue: householdControllerServiceSpy }
+        ]
+      });
+      service = TestBed.inject(HouseholdService);
+
       service.selectedHouseholdId.set(456);
 
       setTimeout(() => {
-        expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('456');
+        expect(localStorageSpy.setItem).toHaveBeenCalledWith('SELECTED_HOUSEHOLD', '456');
 
         // Act
         service.selectedHouseholdId.set(null);
 
         setTimeout(() => {
           // Assert
-          expect(localStorage.getItem('SELECTED_HOUSEHOLD')).toBe('null');
+          expect(localStorageSpy.setItem).toHaveBeenCalledWith('SELECTED_HOUSEHOLD', 'null');
           done();
         }, 0);
       }, 0);
