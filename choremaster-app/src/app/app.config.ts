@@ -1,7 +1,7 @@
 import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
-  provideZonelessChangeDetection,
+  provideZonelessChangeDetection, isDevMode,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
@@ -15,6 +15,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideApi } from '../client';
 import { authInterceptor } from './service/auth.interceptor';
 import { httpErrorInterceptor } from './service/http-error.interceptor';
+import { provideServiceWorker } from '@angular/service-worker';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,6 +37,9 @@ export const appConfig: ApplicationConfig = {
           },
         ],
       } as SocialAuthServiceConfig,
-    },
+    }, provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
   ],
 };
