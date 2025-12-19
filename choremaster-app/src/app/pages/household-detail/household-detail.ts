@@ -113,4 +113,59 @@ export default class HouseholdDetail implements OnInit {
     return `Every ${intervalDays} days`;
   }
 
+  getExecutionStatusText(chore: ChoreDto): string {
+    if (!chore.lastExecution?.executedAt) {
+      return 'Never executed';
+    }
+
+    const lastExecutionDate = new Date(chore.lastExecution.executedAt);
+    const now = new Date();
+    const daysSinceExecution = Math.floor((now.getTime() - lastExecutionDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (daysSinceExecution === 0) {
+      return 'Executed today';
+    } else if (daysSinceExecution === 1) {
+      return 'Executed yesterday';
+    } else {
+      return `Executed ${daysSinceExecution} days ago`;
+    }
+  }
+
+  getDaysUntilDue(chore: ChoreDto): number | null {
+    if (!chore.lastExecution?.executedAt || !chore.intervalDays) {
+      return null;
+    }
+
+    const lastExecutionDate = new Date(chore.lastExecution.executedAt);
+    const dueDate = new Date(lastExecutionDate.getTime() + (chore.intervalDays * 24 * 60 * 60 * 1000));
+    const now = new Date();
+    const daysUntilDue = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+    return daysUntilDue;
+  }
+
+  getDueStatusText(chore: ChoreDto): string {
+    const daysUntilDue = this.getDaysUntilDue(chore);
+
+    if (daysUntilDue === null) {
+      return 'No due date';
+    }
+
+    if (daysUntilDue < 0) {
+      const daysOverdue = Math.abs(daysUntilDue);
+      return daysOverdue === 1 ? 'Overdue by 1 day' : `Overdue by ${daysOverdue} days`;
+    } else if (daysUntilDue === 0) {
+      return 'Due today';
+    } else if (daysUntilDue === 1) {
+      return 'Due tomorrow';
+    } else {
+      return `Due in ${daysUntilDue} days`;
+    }
+  }
+
+  isOverdue(chore: ChoreDto): boolean {
+    const daysUntilDue = this.getDaysUntilDue(chore);
+    return daysUntilDue !== null && daysUntilDue < 0;
+  }
+
 }

@@ -40,6 +40,28 @@
   font-size: 14px;
 }
 
+.execution-status {
+  margin: 4px 0 0 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 13px;
+}
+
+.due-status {
+  margin: 4px 0 0 0;
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.overdue-text {
+  color: #d32f2f;
+  font-weight: 600;
+}
+
+.chore-card.overdue {
+  border-left: 4px solid #d32f2f;
+}
+
 .add-chore-button {
   margin-top: 24px;
 }
