@@ -1,0 +1,60 @@
+{{- if .Values.backend.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: choremaster-backend
+  labels:
+    app: {{ .Chart.Name }}
+    component: backend
+spec:
+  replicas: {{ .Values.backend.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        component: backend
+    spec:
+      initContainers:
+      - name: wait-for-postgresql
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z choremaster-postgresql {{ .Values.postgresql.service.port }}; do echo waiting for postgresql; sleep 2; done;']
+      containers:
+      - name: backend
+        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.backend.service.targetPort }}
+          name: http
+        env:
+        {{- range .Values.backend.env }}
+        - name: {{ .name }}
+          {{- if .value }}
+          value: {{ .value | quote }}
+          {{- else if .valueFrom }}
+          valueFrom:
+            {{- toYaml .valueFrom | nindent 12 }}
+          {{- end }}
+        {{- end }}
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+        resources:
+          {{- toYaml .Values.backend.resources | nindent 10 }}
+        {{- if .Values.backend.livenessProbe }}
+        livenessProbe:
+          {{- toYaml .Values.backend.livenessProbe | nindent 10 }}
+        {{- end }}
+        {{- if .Values.backend.readinessProbe }}
+        readinessProbe:
+          {{- toYaml .Values.backend.readinessProbe | nindent 10 }}
+        {{- end }}
+      volumes:
+      - name: config
+        configMap:
+          name: choremaster-backend-config
+{{- end }}

@@ -1,0 +1,3 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://choremaster-postgresql:5432/choremaster

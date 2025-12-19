@@ -1,0 +1,89 @@
+# PostgreSQL Configuration
+postgresql:
+  enabled: true
+  image:
+    repository: postgres
+    tag: "15-alpine"
+    pullPolicy: IfNotPresent
+  service:
+    port: 5432
+  database:
+    name: choremaster
+    user: postgres
+    password: postgres
+    storageClass: ""
+    size: 5Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Backend Configuration
+backend:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: failender/choremaster-backend
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: ClusterIP
+    port: 8080
+    targetPort: 8080
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: "prod"
+    - name: SPRING_DATASOURCE_URL
+      value: "jdbc:postgresql://choremaster-postgresql:5432/choremaster"
+    - name: SPRING_DATASOURCE_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: choremaster-postgresql-secret
+          key: username
+    - name: SPRING_DATASOURCE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: choremaster-postgresql-secret
+          key: password
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1Gi"
+      cpu: "1000m"
+  livenessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 60
+    periodSeconds: 10
+  readinessProbe:
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 30
+    periodSeconds: 5
+
+# Frontend App Configuration
+app:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: failender/choremaster-app
+    tag: latest
+    pullPolicy: Always
+  service:
+    type: LoadBalancer
+    port: 80
+    targetPort: 80
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
