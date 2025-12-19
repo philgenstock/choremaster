@@ -72,25 +72,26 @@ class ChoreServiceTest {
         Chore savedChore = aChore()
                 .withName(choreName)
                 .withHousehold(household)
+                .withIntervalDays(2)
                 .build();
 
         when(choreRepository.save(any(Chore.class))).thenReturn(savedChore);
 
         // When
-        Chore result = choreService.createChore(choreName, household);
+        Chore result = choreService.createChore(choreName, 2, household);
 
         // Then
         assertThat(result)
-                .extracting(Chore::getName, Chore::getHousehold)
-                .containsExactly(choreName, household);
+                .extracting(Chore::getName, Chore::getHousehold, Chore::getIntervalDays)
+                .containsExactly(choreName, household, 2);
 
         ArgumentCaptor<Chore> choreCaptor = ArgumentCaptor.forClass(Chore.class);
         verify(choreRepository, times(1)).save(choreCaptor.capture());
 
         Chore capturedChore = choreCaptor.getValue();
         assertThat(capturedChore)
-                .extracting(Chore::getName, Chore::getHousehold)
-                .containsExactly(choreName, household);
+                .extracting(Chore::getName, Chore::getHousehold, Chore::getIntervalDays)
+                .containsExactly(choreName, household, 2);
     }
 
     @Test

@@ -39,14 +39,14 @@ class ChoreConvertServiceTest {
     void toNewChore_shouldConvertChoreDtoToChore() {
         // Given
         Household household = aHousehold().build();
-        ChoreDto choreDto = new ChoreDto(5L, "Do the laundry");
+        ChoreDto choreDto = new ChoreDto(5L, "Do the laundry", 3);
 
         // When
         Chore result = choreConvertService.toNewChore(choreDto, household);
 
         // Then
         assertThat(result)
-                .extracting(Chore::getName, Chore::getHousehold)
-                .containsExactly("Do the laundry", household);
+                .extracting(Chore::getName, Chore::getHousehold, Chore::getIntervalDays)
+                .containsExactly("Do the laundry", household, 3);
     }
 }

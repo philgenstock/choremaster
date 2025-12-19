@@ -16,8 +16,8 @@ public class ChoreService {
         return choreRepository.findByHousehold(household);
     }
 
-    public Chore createChore(String name, Household household) {
-        Chore chore = new Chore(name, household);
+    public Chore createChore(String name, Integer intervalDays, Household household) {
+        Chore chore = new Chore(name, intervalDays, household);
         return choreRepository.save(chore);
     }
 
@@ -28,5 +28,12 @@ public class ChoreService {
 
     public void deleteChore(Long choreId) {
         choreRepository.deleteById(choreId);
+    }
+
+    public Chore updateChore(Long choreId, String name, Integer intervalDays) {
+        Chore chore = getChoreById(choreId);
+        chore.setName(name);
+        chore.setIntervalDays(intervalDays);
+        return choreRepository.save(chore);
     }
 }

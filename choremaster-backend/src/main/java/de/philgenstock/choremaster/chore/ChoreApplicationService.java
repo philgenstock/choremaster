@@ -28,7 +28,7 @@ public class ChoreApplicationService {
     public ChoreDto createChore(CreateChoreRequest request) {
         Household household = householdRepository.findById(request.householdId())
                 .orElseThrow(() -> new IllegalArgumentException("Household not found with id: " + request.householdId()));
-        Chore chore = choreService.createChore(request.name(), household);
+        Chore chore = choreService.createChore(request.name(), request.intervalDays(), household);
         return choreConvertService.toDto(chore);
     }
 
@@ -38,5 +38,11 @@ public class ChoreApplicationService {
 
     public ChoreDto getChoreById(Long choreId) {
         return choreConvertService.toDto(choreService.getChoreById(choreId));
+    }
+
+    @Transactional
+    public ChoreDto updateChore(Long choreId, UpdateChoreRequest request) {
+        Chore chore = choreService.updateChore(choreId, request.name(), request.intervalDays());
+        return choreConvertService.toDto(chore);
     }
 }
