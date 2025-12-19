@@ -13,7 +13,7 @@ public class ChoreService {
     private final ChoreRepository choreRepository;
 
     public List<Chore> getChoresByHousehold(Household household) {
-        return choreRepository.findByHousehold(household);
+        return choreRepository.findByHouseholdWithLastExecution(household);
     }
 
     public Chore createChore(String name, Integer intervalDays, Household household) {
@@ -22,7 +22,7 @@ public class ChoreService {
     }
 
     public Chore getChoreById(Long choreId) {
-        return choreRepository.findById(choreId)
+        return choreRepository.findByIdWithLastExecution(choreId)
                 .orElseThrow(() -> new IllegalArgumentException("Chore not found with id: " + choreId));
     }
 
