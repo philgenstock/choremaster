@@ -17,6 +17,7 @@ model/createChoreRequest.ts
 model/createHouseholdRequest.ts
 model/householdDto.ts
 model/models.ts
+model/updateChoreRequest.ts
 param.ts
 provide-api.ts
 variables.ts
