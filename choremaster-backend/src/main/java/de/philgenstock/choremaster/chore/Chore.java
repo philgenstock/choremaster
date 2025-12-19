@@ -17,6 +17,9 @@ public class Chore extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private Integer intervalDays;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "household_id", nullable = false)
     private Household household;
@@ -24,8 +27,9 @@ public class Chore extends BaseEntity {
     public Chore() {
     }
 
-    public Chore(String name, Household household) {
+    public Chore(String name, Integer intervalDays, Household household) {
         this.name = name;
+        this.intervalDays = intervalDays;
         this.household = household;
     }
 }

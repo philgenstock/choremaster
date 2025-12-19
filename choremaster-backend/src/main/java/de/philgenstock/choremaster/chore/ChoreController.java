@@ -31,4 +31,9 @@ public class ChoreController {
     public void deleteChore(@PathVariable Long choreId) {
         choreApplicationService.deleteChore(choreId);
     }
+
+    @PutMapping(value = "chore/{choreId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ChoreDto updateChore(@PathVariable Long choreId, @RequestBody UpdateChoreRequest request) {
+        return choreApplicationService.updateChore(choreId, request);
+    }
 }

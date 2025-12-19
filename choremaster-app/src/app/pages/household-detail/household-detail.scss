@@ -23,11 +23,21 @@
     font-size: 18px;
   }
 
+  mat-card-content {
+    padding-top: 0;
+  }
+
   mat-card-actions {
     display: flex;
     justify-content: flex-end;
     padding: 8px 16px;
   }
+}
+
+.interval-text {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
 }
 
 .add-chore-button {

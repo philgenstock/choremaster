@@ -12,5 +12,6 @@
 export interface ChoreDto { 
     id?: number;
     name?: string;
+    intervalDays?: number;
 }
 

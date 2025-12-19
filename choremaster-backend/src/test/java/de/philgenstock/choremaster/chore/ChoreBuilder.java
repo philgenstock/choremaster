@@ -7,6 +7,7 @@ public class ChoreBuilder extends BaseEntityBuilder<Chore, ChoreBuilder> {
 
     private String name = "Test Chore";
     private Household household;
+    private Integer intervalDays = 3;
 
     public static ChoreBuilder aChore() {
         return new ChoreBuilder();
@@ -22,12 +23,18 @@ public class ChoreBuilder extends BaseEntityBuilder<Chore, ChoreBuilder> {
         return this;
     }
 
+    public ChoreBuilder withIntervalDays(int integerDays) {
+        this.intervalDays = integerDays;
+        return this;
+    }
+
     @Override
     public Chore build() {
         Chore chore = new Chore();
         applyBaseFields(chore);
         chore.setName(name);
         chore.setHousehold(household);
+        chore.setIntervalDays(intervalDays);
         return chore;
     }
 }

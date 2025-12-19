@@ -9,9 +9,8 @@
  */
 
 
-export interface CreateChoreRequest { 
+export interface UpdateChoreRequest { 
     name: string;
     intervalDays: number;
-    householdId: number;
 }
 

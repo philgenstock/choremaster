@@ -1,13 +1,22 @@
-<h2 mat-dialog-title>Create New Chore</h2>
+<h2 mat-dialog-title>{{ dialogTitle }}</h2>
 <mat-dialog-content>
   <mat-form-field>
     <mat-label>Chore Name</mat-label>
-    <input matInput [(ngModel)]="choreName" placeholder="Enter chore name" (keyup.enter)="onConfirm()" autofocus />
+    <input matInput [(ngModel)]="choreName" placeholder="Enter chore name" autofocus />
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Interval</mat-label>
+    <mat-select [(ngModel)]="intervalDays">
+      @for (preset of intervalPresets; track preset.value) {
+        <mat-option [value]="preset.value">{{ preset.label }}</mat-option>
+      }
+    </mat-select>
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
   <button mat-raised-button color="primary" (click)="onConfirm()" [disabled]="!choreName.trim()">
-    Create
+    {{ confirmButtonText }}
   </button>
 </mat-dialog-actions>
