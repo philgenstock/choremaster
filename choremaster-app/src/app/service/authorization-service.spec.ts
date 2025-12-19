@@ -59,33 +59,57 @@ describe('AuthorizationService', () => {
       expect(service).toBeTruthy();
     });
 
-    it('should initialize with null authorizationInfo when localStorage is empty', () => {
+    it('should initialize with null authorizationInfo when not validated yet', () => {
       localStorageSpy.getItem.and.returnValue(null);
       service = TestBed.inject(AuthorizationService);
       authorizationInfoService = TestBed.inject(AuthorizationInfoService);
 
       expect(authorizationInfoService.authorizationInfo()).toBeNull();
-      expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
+      expect(service.isValidating()).toBe(false);
+    });
+  });
+
+  describe('validateStoredAuth', () => {
+    beforeEach(() => {
+      localStorageSpy.getItem.and.returnValue(null);
+      service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
     });
 
-    it('should load authorizationInfo from localStorage on initialization when token is valid', (done) => {
+    it('should set isValidating to true during validation', async () => {
       localStorageSpy.getItem.and.returnValue(JSON.stringify(mockAuthInfo));
       userControllerServiceSpy.login.and.returnValue(of(undefined as any));
 
-      service = TestBed.inject(AuthorizationService);
-      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
+      const validationPromise = service.validateStoredAuth();
+      expect(service.isValidating()).toBe(true);
 
-      setTimeout(() => {
-        expect(authorizationInfoService.authorizationInfo()).toEqual(mockAuthInfo);
-        expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
-        expect(userControllerServiceSpy.login).toHaveBeenCalledWith(mockAuthInfo.token);
-        expect(householdServiceSpy.loadHouseholds).toHaveBeenCalledTimes(1);
-        done();
-      }, 0);
+      await validationPromise;
+      expect(service.isValidating()).toBe(false);
     });
 
+    it('should do nothing when localStorage is empty', async () => {
+      localStorageSpy.getItem.and.returnValue(null);
 
-    it('should remove expired token from localStorage on initialization', (done) => {
+      await service.validateStoredAuth();
+
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
+      expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
+      expect(userControllerServiceSpy.login).not.toHaveBeenCalled();
+    });
+
+    it('should load authorizationInfo from localStorage when token is valid', async () => {
+      localStorageSpy.getItem.and.returnValue(JSON.stringify(mockAuthInfo));
+      userControllerServiceSpy.login.and.returnValue(of(undefined as any));
+
+      await service.validateStoredAuth();
+
+      expect(authorizationInfoService.authorizationInfo()).toEqual(mockAuthInfo);
+      expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
+      expect(userControllerServiceSpy.login).toHaveBeenCalledWith(mockAuthInfo.token);
+      expect(householdServiceSpy.loadHouseholds).toHaveBeenCalledTimes(1);
+    });
+
+    it('should remove expired token from localStorage', async () => {
       const expiredAuthInfo: AuthorizationInfo = {
         token: 'expired-token',
         name: 'Test User',
@@ -97,15 +121,22 @@ describe('AuthorizationService', () => {
         throwError(() => ({ status: 401, message: 'Unauthorized' }))
       );
 
-      service = TestBed.inject(AuthorizationService);
-      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
+      await service.validateStoredAuth();
 
-      setTimeout(() => {
-        expect(authorizationInfoService.authorizationInfo()).toBeNull();
-        expect(userControllerServiceSpy.login).toHaveBeenCalledWith(expiredAuthInfo.token);
-        expect(localStorageSpy.removeItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
-        done();
-      }, 0);
+      expect(authorizationInfoService.authorizationInfo()).toBeNull();
+      expect(userControllerServiceSpy.login).toHaveBeenCalledWith(expiredAuthInfo.token);
+      expect(localStorageSpy.removeItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
+    });
+
+    it('should set isValidating to false even when validation fails', async () => {
+      localStorageSpy.getItem.and.returnValue(JSON.stringify(mockAuthInfo));
+      userControllerServiceSpy.login.and.returnValue(
+        throwError(() => ({ status: 500, message: 'Server error' }))
+      );
+
+      await service.validateStoredAuth();
+
+      expect(service.isValidating()).toBe(false);
     });
   });
 

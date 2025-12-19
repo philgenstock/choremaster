@@ -11,5 +11,5 @@ import { AuthorizationService } from './service/authorization-service';
 export class App {
   protected readonly title = signal('choremaster-app');
 
-  private authorizationService = inject(AuthorizationService)
+  protected authorizationService = inject(AuthorizationService)
 }
