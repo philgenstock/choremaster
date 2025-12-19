@@ -1,11 +1,6 @@
 name: Frontend Tests
 
 on:
-  push:
-    branches: [ main]
-    paths:
-      - 'choremaster-app/**'
-      - '.github/workflows/frontend-tests.yml'
   pull_request:
     branches: [ main]
     paths:
