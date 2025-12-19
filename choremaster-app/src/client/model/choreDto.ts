@@ -7,11 +7,13 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ChoreExecutionDto } from './choreExecutionDto';
 
 
 export interface ChoreDto { 
     id?: number;
     name?: string;
     intervalDays?: number;
+    lastExecution?: ChoreExecutionDto;
 }
 
