@@ -4,7 +4,13 @@
     @for (chore of chores(); track chore.id) {
         <mat-card appearance="outlined" (click)="navigateToChore(chore)" class="chore-card">
             <mat-card-title>{{chore.name}}</mat-card-title>
+            <mat-card-content>
+                <p class="interval-text">{{ getIntervalText(chore.intervalDays) }}</p>
+            </mat-card-content>
             <mat-card-actions>
+                <button matButton (click)="openEditChoreDialog(chore); $event.stopPropagation()">
+                    <mat-icon>edit</mat-icon>
+                </button>
                 <button matButton (click)="deleteChore(chore); $event.stopPropagation()">
                     <mat-icon>delete_forever</mat-icon>
                 </button>
