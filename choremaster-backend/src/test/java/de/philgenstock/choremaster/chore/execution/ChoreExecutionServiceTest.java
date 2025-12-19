@@ -1,6 +1,7 @@
 package de.philgenstock.choremaster.chore.execution;
 
 import de.philgenstock.choremaster.chore.Chore;
+import de.philgenstock.choremaster.chore.ChoreRepository;
 import de.philgenstock.choremaster.user.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,9 @@ class ChoreExecutionServiceTest {
 
     @Mock
     private ChoreExecutionRepository choreExecutionRepository;
+
+    @Mock
+    private ChoreRepository choreRepository;
 
     @InjectMocks
     private ChoreExecutionService choreExecutionService;
@@ -75,5 +79,13 @@ class ChoreExecutionServiceTest {
         assertThat(capturedExecution)
                 .extracting(ChoreExecution::getChore, ChoreExecution::getExecutor)
                 .containsExactly(chore, executor);
+
+        ArgumentCaptor<Chore> choreCaptor = ArgumentCaptor.forClass(Chore.class);
+        verify(choreRepository, times(1)).save(choreCaptor.capture());
+
+        Chore capturedChore = choreCaptor.getValue();
+        assertThat(capturedChore)
+                .returns(savedExecution, Chore::getLastExecution);
+
     }
 }

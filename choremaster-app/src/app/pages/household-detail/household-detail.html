@@ -2,10 +2,12 @@
     <h1>Chores</h1>
 
     @for (chore of chores(); track chore.id) {
-        <mat-card appearance="outlined" (click)="navigateToChore(chore)" class="chore-card">
+        <mat-card appearance="outlined" (click)="navigateToChore(chore)" class="chore-card" [class.overdue]="isOverdue(chore)">
             <mat-card-title>{{chore.name}}</mat-card-title>
             <mat-card-content>
                 <p class="interval-text">{{ getIntervalText(chore.intervalDays) }}</p>
+                <p class="execution-status">{{ getExecutionStatusText(chore) }}</p>
+                <p class="due-status" [class.overdue-text]="isOverdue(chore)">{{ getDueStatusText(chore) }}</p>
             </mat-card-content>
             <mat-card-actions>
                 <button matButton (click)="openEditChoreDialog(chore); $event.stopPropagation()">

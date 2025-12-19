@@ -28,32 +28,25 @@ class ChoreServiceTest {
     void getChoresByHousehold_shouldReturnChoresForHousehold() {
         // Given
         Household household = aHousehold().build();
-        Chore chore1 = aChore()
-                .withName("Clean the kitchen")
-                .withHousehold(household)
-                .build();
-        Chore chore2 = aChore()
-                .withName("Do the laundry")
-                .withHousehold(household)
-                .build();
+        Chore chore = aChore().build();
 
-        List<Chore> chores = List.of(chore1, chore2);
-        when(choreRepository.findByHousehold(household)).thenReturn(chores);
+        List<Chore> chores = List.of(chore);
+        when(choreRepository.findByHouseholdWithLastExecution(household)).thenReturn(chores);
 
         // When
         List<Chore> result = choreService.getChoresByHousehold(household);
 
         // Then
         assertThat(result)
-                .containsExactlyInAnyOrder(chore1, chore2);
-        verify(choreRepository, times(1)).findByHousehold(household);
+                .containsExactlyInAnyOrder(chore);
+        verify(choreRepository, times(1)).findByHouseholdWithLastExecution(household);
     }
 
     @Test
     void getChoresByHousehold_shouldReturnEmptyListWhenNoChoresExistForHousehold() {
         // Given
         Household household = aHousehold().build();
-        when(choreRepository.findByHousehold(household)).thenReturn(List.of());
+        when(choreRepository.findByHouseholdWithLastExecution(household)).thenReturn(List.of());
 
         // When
         List<Chore> result = choreService.getChoresByHousehold(household);

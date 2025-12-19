@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static de.philgenstock.choremaster.chore.ChoreBuilder.aChore;
+import static de.philgenstock.choremaster.chore.ChoreDtoBuilder.aChoreDto;
 import static de.philgenstock.choremaster.household.HouseholdBuilder.aHousehold;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,27 +38,22 @@ class ChoreApplicationServiceTest {
         // Given
         Long householdId = 10L;
         Household household = aHousehold().withId(householdId).build();
-        Chore chore1 = aChore()
+        Chore chore = aChore()
                 .withIntervalDays(2)
                 .build();
-        Chore chore2 = aChore()
-                .withIntervalDays(3)
-                .build();
 
-        ChoreDto choreDto1 = new ChoreDto(1L, "Clean the kitchen", 2);
-        ChoreDto choreDto2 = new ChoreDto(2L, "Do the laundry", 3);
+        ChoreDto choreDto = aChoreDto().build();
 
         when(householdRepository.findById(householdId)).thenReturn(Optional.of(household));
-        when(choreService.getChoresByHousehold(household)).thenReturn(List.of(chore1, chore2));
-        when(choreConvertService.toDto(chore1)).thenReturn(choreDto1);
-        when(choreConvertService.toDto(chore2)).thenReturn(choreDto2);
+        when(choreService.getChoresByHousehold(household)).thenReturn(List.of(chore));
+        when(choreConvertService.toDto(chore)).thenReturn(choreDto);
 
         // When
         List<ChoreDto> result = choreApplicationService.getChoresByHouseholdId(householdId);
 
         // Then
         assertThat(result)
-                .containsExactlyInAnyOrder(choreDto1, choreDto2);
+                .containsExactlyInAnyOrder(choreDto);
         verify(householdRepository, times(1)).findById(householdId);
         verify(choreService, times(1)).getChoresByHousehold(household);
     }
@@ -102,7 +98,7 @@ class ChoreApplicationServiceTest {
                 .withName("Vacuum the living room")
                 .withHousehold(household)
                 .build();
-        ChoreDto choreDto = new ChoreDto(1L, "Vacuum the living room", 2);
+        ChoreDto choreDto = aChoreDto().build();
 
         when(householdRepository.findById(10L)).thenReturn(Optional.of(household));
         when(choreService.createChore("Vacuum the living room", 2, household)).thenReturn(chore);
