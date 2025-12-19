@@ -18,11 +18,9 @@ export default class Login implements OnInit {
 
   ngOnInit() {
     // If user is already logged in, redirect to the intended page or dashboard
-    console.debug(this.authorizationInfoService.authorizationInfo())
     if (this.authorizationInfoService.authorizationInfo()) {
       const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
       this.router.navigateByUrl(returnUrl);
-      console.debug("nav", returnUrl)
     }
   }
 }

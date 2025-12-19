@@ -1,2 +1,9 @@
-<app-header></app-header>
-<router-outlet></router-outlet>
+@if (authorizationService.isValidating()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Loading...</p>
+  </div>
+} @else {
+  <app-header></app-header>
+  <router-outlet></router-outlet>
+}

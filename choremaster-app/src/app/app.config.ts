@@ -1,7 +1,7 @@
 import {
   ApplicationConfig,
   provideBrowserGlobalErrorListeners,
-  provideZonelessChangeDetection, isDevMode,
+  provideZonelessChangeDetection, isDevMode, APP_INITIALIZER,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
@@ -16,6 +16,12 @@ import { provideApi } from '../client';
 import { authInterceptor } from './service/auth.interceptor';
 import { httpErrorInterceptor } from './service/http-error.interceptor';
 import { provideServiceWorker } from '@angular/service-worker';
+import { AuthorizationService } from './service/authorization-service';
+
+
+export function initializeAuth(authService: AuthorizationService) {
+  return () => authService.validateStoredAuth();
+}
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -24,6 +30,12 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor, httpErrorInterceptor])),
     provideApi('http://localhost:8080'),
     provideRouter(routes),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: initializeAuth,
+      deps: [AuthorizationService],
+      multi: true
+    },
     {
       provide: SOCIAL_AUTH_CONFIG,
       useValue: {

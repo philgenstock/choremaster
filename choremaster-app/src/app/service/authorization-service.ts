@@ -1,10 +1,11 @@
-import { inject, Injectable, Signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { inject, Injectable, Signal, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthorizationInfo } from '../../model/authorization-info';
 import { SocialAuthService } from '@abacritt/angularx-social-login';
 import { UserControllerService } from '../../client';
 import { HouseholdService } from './household-service';
 import { AuthorizationInfoService } from './authorization-info-service';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -16,25 +17,13 @@ export class AuthorizationService {
   private userControllerService = inject(UserControllerService)
   private householdService = inject(HouseholdService)
   private router = inject(Router)
-  
+  private route = inject(ActivatedRoute);
+
+  // Track validation state
+  public isValidating = signal(false);
+
   constructor() {
-    const localStorageAuthorization = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if(localStorageAuthorization) {
-      const authInfo = JSON.parse(localStorageAuthorization);
-      // Try to validate the token with the backend
-      this.userControllerService.login(authInfo.token).subscribe({
-        next: () => {
-          // Token is still valid
-          this.authorizationInfoService.authorizationInfo.set(authInfo)
-          this.householdService.loadHouseholds()
-        },
-        error: () => {
-          // Token is invalid or expired, remove it
-          console.debug('Stored token is invalid or expired, removing from localStorage')
-          this.removeAuthorizationInfo()
-        }
-      })
-    }
+    // Social auth subscription - runs after initial validation
     this.socialAuthService.authState.subscribe((user) => {
       console.debug('user changed', user)
       if(user.idToken) {
@@ -49,6 +38,32 @@ export class AuthorizationService {
         this.removeAuthorizationInfo()
       }
     });
+  }
+
+  async validateStoredAuth(): Promise<void> {
+    this.isValidating.set(true);
+
+    try {
+      const localStorageAuthorization = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if(localStorageAuthorization) {
+        const authInfo = JSON.parse(localStorageAuthorization);
+
+        try {
+          // Try to validate the token with the backend
+          await firstValueFrom(this.userControllerService.login(authInfo.token));
+
+          // Token is still valid
+          this.authorizationInfoService.authorizationInfo.set(authInfo);
+          this.householdService.loadHouseholds();
+        } catch (error) {
+          // Token is invalid or expired, remove it
+          console.debug('Stored token is invalid or expired, removing from localStorage');
+          this.removeAuthorizationInfo();
+        }
+      }
+    } finally {
+      this.isValidating.set(false);
+    }
   }
 
   setAuthorizationInfo(authorizationInfo: AuthorizationInfo) {
