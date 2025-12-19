@@ -6,7 +6,7 @@ import { defaultTestProvidersWithAuth } from '../../test-utils';
 import { UserControllerService } from '../../client';
 import { HouseholdService } from './household-service';
 import { AuthorizationInfoService } from './authorization-info-service';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 
 describe('AuthorizationService', () => {
   let service: AuthorizationService;
@@ -30,7 +30,7 @@ describe('AuthorizationService', () => {
     });
 
     userControllerServiceSpy = jasmine.createSpyObj('UserControllerService', ['login']);
-    (userControllerServiceSpy.login as jasmine.Spy).and.returnValue(of({}));
+    (userControllerServiceSpy.login as jasmine.Spy).and.returnValue(of(undefined as any));
 
     householdServiceSpy = jasmine.createSpyObj('HouseholdService', ['loadHouseholds', 'resetHouseholds']);
 
@@ -68,13 +68,44 @@ describe('AuthorizationService', () => {
       expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
     });
 
-    it('should load authorizationInfo from localStorage on initialization', () => {
+    it('should load authorizationInfo from localStorage on initialization when token is valid', (done) => {
       localStorageSpy.getItem.and.returnValue(JSON.stringify(mockAuthInfo));
+      userControllerServiceSpy.login.and.returnValue(of(undefined as any));
+
       service = TestBed.inject(AuthorizationService);
       authorizationInfoService = TestBed.inject(AuthorizationInfoService);
 
-      expect(authorizationInfoService.authorizationInfo()).toEqual(mockAuthInfo);
-      expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
+      setTimeout(() => {
+        expect(authorizationInfoService.authorizationInfo()).toEqual(mockAuthInfo);
+        expect(localStorageSpy.getItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
+        expect(userControllerServiceSpy.login).toHaveBeenCalledWith(mockAuthInfo.token);
+        expect(householdServiceSpy.loadHouseholds).toHaveBeenCalledTimes(1);
+        done();
+      }, 0);
+    });
+
+
+    it('should remove expired token from localStorage on initialization', (done) => {
+      const expiredAuthInfo: AuthorizationInfo = {
+        token: 'expired-token',
+        name: 'Test User',
+        imgUrl: 'https://example.com/avatar.jpg',
+        email: 'test@mail.de'
+      };
+      localStorageSpy.getItem.and.returnValue(JSON.stringify(expiredAuthInfo));
+      userControllerServiceSpy.login.and.returnValue(
+        throwError(() => ({ status: 401, message: 'Unauthorized' }))
+      );
+
+      service = TestBed.inject(AuthorizationService);
+      authorizationInfoService = TestBed.inject(AuthorizationInfoService);
+
+      setTimeout(() => {
+        expect(authorizationInfoService.authorizationInfo()).toBeNull();
+        expect(userControllerServiceSpy.login).toHaveBeenCalledWith(expiredAuthInfo.token);
+        expect(localStorageSpy.removeItem).toHaveBeenCalledWith('AUTHORIZATION_INFO');
+        done();
+      }, 0);
     });
   });
 
@@ -119,7 +150,7 @@ describe('AuthorizationService', () => {
     it('should call login and then loadHouseholds in correct order', (done) => {
       let loginCalled = false;
       (userControllerServiceSpy.login as jasmine.Spy).and.returnValue(
-        of({}).pipe(
+        of(undefined as any).pipe(
           // Use tap to verify order
           (source) => {
             return new Observable(observer => {

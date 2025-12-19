@@ -20,8 +20,20 @@ export class AuthorizationService {
   constructor() {
     const localStorageAuthorization = localStorage.getItem(LOCAL_STORAGE_KEY);
     if(localStorageAuthorization) {
-      this.authorizationInfoService.authorizationInfo.set(JSON.parse(localStorageAuthorization))
-      this.householdService.loadHouseholds()
+      const authInfo = JSON.parse(localStorageAuthorization);
+      // Try to validate the token with the backend
+      this.userControllerService.login(authInfo.token).subscribe({
+        next: () => {
+          // Token is still valid
+          this.authorizationInfoService.authorizationInfo.set(authInfo)
+          this.householdService.loadHouseholds()
+        },
+        error: () => {
+          // Token is invalid or expired, remove it
+          console.debug('Stored token is invalid or expired, removing from localStorage')
+          this.removeAuthorizationInfo()
+        }
+      })
     }
     this.socialAuthService.authState.subscribe((user) => {
       console.debug('user changed', user)
