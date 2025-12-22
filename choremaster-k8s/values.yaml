@@ -27,7 +27,7 @@ backend:
     tag: latest
     pullPolicy: Always
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 8080
     targetPort: 8080
   env:
@@ -61,7 +61,7 @@ app:
     tag: latest
     pullPolicy: Always
   service:
-    type: LoadBalancer
+    type: ClusterIP
     port: 80
     targetPort: 80
   resources:
