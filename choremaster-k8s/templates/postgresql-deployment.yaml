@@ -19,14 +19,14 @@ spec:
     spec:
       containers:
       - name: postgresql
-        image: "{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
-        imagePullPolicy: {{ .Values.postgresql.image.pullPolicy }}
+        image: "postgres:15-alpine"
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: {{ .Values.postgresql.service.port }}
+        - containerPort: 5432
           name: postgresql
         env:
         - name: POSTGRES_DB
-          value: {{ .Values.postgresql.database.name }}
+          value: choremaster
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -43,13 +43,18 @@ spec:
         - name: postgresql-storage
           mountPath: /var/lib/postgresql/data
         resources:
-          {{- toYaml .Values.postgresql.resources | nindent 10 }}
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         livenessProbe:
           exec:
             command:
             - /bin/sh
             - -c
-            - pg_isready -U {{ .Values.postgresql.database.user }}
+            - pg_isready -U postgres
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
@@ -57,7 +62,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - pg_isready -U {{ .Values.postgresql.database.user }}
+            - pg_isready -U postgres
           initialDelaySeconds: 5
           periodSeconds: 5
       volumes:

@@ -6,7 +6,7 @@ metadata:
     app: {{ .Chart.Name }}
     component: backend
 spec:
-  replicas: {{ .Values.backend.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
@@ -20,38 +20,40 @@ spec:
       initContainers:
       - name: wait-for-postgresql
         image: busybox:1.28
-        command: ['sh', '-c', 'until nc -z choremaster-postgresql {{ .Values.postgresql.service.port }}; do echo waiting for postgresql; sleep 2; done;']
+        command: ['sh', '-c', 'until nc -z choremaster-postgresql 5432; do echo waiting for postgresql; sleep 2; done;']
       containers:
       - name: backend
-        image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
-        imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+        image: "failender/choremaster-backend:latest"
+        imagePullPolicy: Always
         ports:
-        - containerPort: {{ .Values.backend.service.targetPort }}
+        - containerPort: 8080
           name: http
         env:
-        {{- range .Values.backend.env }}
-        - name: {{ .name }}
-          {{- if .value }}
-          value: {{ .value | quote }}
-          {{- else if .valueFrom }}
-          valueFrom:
-            {{- toYaml .valueFrom | nindent 12 }}
-          {{- end }}
-        {{- end }}
+        - name: SPRING_PROFILES_ACTIVE
+          value: "prod"
         volumeMounts:
         - name: config
           mountPath: /app/config
           readOnly: true
         resources:
-          {{- toYaml .Values.backend.resources | nindent 10 }}
-        {{- if .Values.backend.livenessProbe }}
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1000m"
         livenessProbe:
-          {{- toYaml .Values.backend.livenessProbe | nindent 10 }}
-        {{- end }}
-        {{- if .Values.backend.readinessProbe }}
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
         readinessProbe:
-          {{- toYaml .Values.backend.readinessProbe | nindent 10 }}
-        {{- end }}
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 5
       volumes:
       - name: config
         configMap:

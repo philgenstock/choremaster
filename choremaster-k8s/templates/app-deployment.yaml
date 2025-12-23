@@ -6,7 +6,7 @@ metadata:
     app: {{ .Chart.Name }}
     component: app
 spec:
-  replicas: {{ .Values.app.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
@@ -19,13 +19,18 @@ spec:
     spec:
       containers:
       - name: app
-        image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
-        imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+        image: "failender/choremaster-app:latest"
+        imagePullPolicy: Always
         ports:
-        - containerPort: {{ .Values.app.service.targetPort }}
+        - containerPort: 80
           name: http
         resources:
-          {{- toYaml .Values.app.resources | nindent 10 }}
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
         livenessProbe:
           httpGet:
             path: /

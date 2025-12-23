@@ -6,9 +6,9 @@ metadata:
     app: {{ .Chart.Name }}
     component: app
 spec:
-  type: {{ .Values.app.service.type }}
+  type: ClusterIP
   ports:
-  - port: {{ .Values.app.service.port }}
+  - port: 80
     targetPort: http
     protocol: TCP
     name: http
