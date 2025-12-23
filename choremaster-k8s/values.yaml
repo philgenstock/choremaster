@@ -71,3 +71,17 @@ app:
     limits:
       memory: "256Mi"
       cpu: "200m"
+  ingress:
+    enabled: true
+    className: "nginx"
+    annotations:
+      cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    hosts:
+      - host: choremaster.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: choremaster-app-tls
+        hosts:
+          - choremaster.example.com
